@@ -1,26 +1,60 @@
 @import "tailwindcss";
+@import "@heroui/styles"; 
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.container {
+  max-width: 1320px;
+  margin: auto;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --font-poppins: var(--font-poppins), sans-serif;
+  --font-inter: var(--font-inter), sans-serif;
+  --color-primary: #6a313d;
+  --color-secondary: #a77d48;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* flash sales section */
+.mySwiper {
+  overflow: hidden !important; 
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+  margin-top: -24px !important;
+  margin-bottom: calc(51px - 24px) !important;
+}
+.mySwiper .swiper-wrapper {
+  overflow: visible !important;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.mySwiper .swiper-slide {
+  overflow: visible !important;
+}
+
+/* Swiper Custom Dash Pagination Triggers */
+.custom-swiper .swiper-pagination {
+  bottom: 16px !important;
+  left: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.custom-swiper .swiper-pagination-bullet {
+  width: 16px !important; 
+  height: 4px !important;  
+  border-radius: 2px !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  transition: all 0.3s ease !important;
+}
+.custom-swiper .swiper-pagination-bullet-active {
+  width: 32px !important; 
+  background-color: #ffffff !important;
+}
+
+/* related items */
+.swiper-button-lock {
+  display: flex !important;
 }
