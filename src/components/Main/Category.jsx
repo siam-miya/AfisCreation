@@ -1,32 +1,46 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SectionHeading from './SectionHeading';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import { FaArrowLeft, FaArrowRight, FaComputer } from 'react-icons/fa6';
-import CategoryCard from './CategoryCard';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import { IoIosPhonePortrait } from 'react-icons/io';
-import { BsSmartwatch } from 'react-icons/bs';
-import { CiCamera, CiHeadphones } from 'react-icons/ci';
-import { LuGamepad } from 'react-icons/lu';
-import { AiOutlineLaptop } from 'react-icons/ai';
+import { AiOutlineStar, AiOutlineGift } from 'react-icons/ai';
+import { GiPerfumeBottle } from 'react-icons/gi';
+import { MdOutlineFiberNew } from 'react-icons/md';
+import CategoryCard from './CategoryCard';
 
 const Category = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentCategory = searchParams.get("category") || "all";
+
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
 
+  // Available icon gulo diye category data setup kora holo
   const categoryData = [
-    { text: "Phone", icon: IoIosPhonePortrait },
-    { text: "Computer", icon: FaComputer },
-    { text: "SmartWatch", icon: BsSmartwatch },
-    { text: "Camera", icon: CiCamera },
-    { text: "Headphone", icon: CiHeadphones },
-    { text: "Gaming", icon: LuGamepad },
-    { text: "Laptop", icon: AiOutlineLaptop }
+    { name: "All Categories", slug: "all", icon: IoIosPhonePortrait },
+    { name: "Beauty & Makeup", slug: "beauty", icon: AiOutlineStar },
+    { name: "Fragrances", slug: "fragrances", icon: GiPerfumeBottle },
+    { name: "Fashion Accessories", slug: "furniture", icon: AiOutlineGift },
+    { name: "New Arrivals", slug: "groceries", icon: MdOutlineFiberNew }
   ];
+
+  const handleCategoryClick = (slug) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (slug === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", slug);
+    }
+    params.set("page", "1");
+    router.push(`/products?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <section className="mb-4 sm:mb-8 md:mb-10 w-full overflow-hidden">
@@ -37,24 +51,25 @@ const Category = () => {
             <div className="flex gap-2 justify-end">
               <button
                 ref={(node) => setPrevEl(node)}
-                className="bg-[#F5F5F5] hover:bg-primary hover:text-white text-black p-2 md:p-3 rounded-full transition-all disabled:opacity-50 cursor-pointer"
+                className="bg-[#F5F5F5] hover:bg-[#8a5830] hover:text-white text-black p-2 md:p-3 rounded-full transition-all disabled:opacity-50 cursor-pointer"
               >
                 <FaArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </button>
               <button
                 ref={(node) => setNextEl(node)}
-                className="bg-[#F5F5F5] hover:bg-primary hover:text-white text-black p-2 md:p-3 rounded-full transition-all disabled:opacity-50 cursor-pointer"
+                className="bg-[#F5F5F5] hover:bg-[#8a5830] hover:text-white text-black p-2 md:p-3 rounded-full transition-all disabled:opacity-50 cursor-pointer"
               >
                 <FaArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </button>
             </div>
           </div>
+
           <div className="mt-2 sm:mt-6 md:mt-10 mb-2 sm:mb-6 md:mb-[51px]">
             {prevEl && nextEl && (
               <Swiper
                 modules={[Navigation]}
                 spaceBetween={32}
-                slidesPerView={6}
+                slidesPerView={5}
                 navigation={{
                   prevEl: prevEl,
                   nextEl: nextEl,
@@ -62,16 +77,26 @@ const Category = () => {
                 breakpoints={{
                   320: { slidesPerView: 2.2, spaceBetween: 12 },
                   480: { slidesPerView: 3, spaceBetween: 16 },
-                  768: { slidesPerView: 4, spaceBetween: 24 },
-                  1024: { slidesPerView: 6, spaceBetween: 32 },
+                  768: { slidesPerView: 3.5, spaceBetween: 24 },
+                  1024: { slidesPerView: 5, spaceBetween: 32 },
                 }}
                 className="mySwiper !overflow-visible md:!overflow-hidden"
               >
-                {categoryData.map((category, index) => (
-                  <SwiperSlide key={index}>
-                    <CategoryCard icon={category.icon} text={category.text} />
-                  </SwiperSlide>
-                ))}
+                {categoryData.map((category, index) => {
+                  const isActive = currentCategory === category.slug || (category.slug === "all" && !searchParams.get("category"));
+                  
+                  return (
+                    <SwiperSlide key={index}>
+                      <div onClick={() => handleCategoryClick(category.slug)} className="cursor-pointer">
+                        <CategoryCard 
+                          icon={category.icon} 
+                          text={category.name} 
+                          isActive={isActive}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
               </Swiper>
             )}
           </div>

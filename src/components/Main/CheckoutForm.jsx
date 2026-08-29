@@ -21,6 +21,7 @@ const CheckoutForm = () => {
     fullName: '',
     streetAddress: '',
     phoneNumber: '',
+    orderNotes: '',
     saveInfo: false,
   });
 
@@ -64,6 +65,8 @@ const CheckoutForm = () => {
       toast.error('Please fill in all required fields.');
       return;
     }
+    
+    // formData.orderNotes can now be submitted along with your order payload
     toast.success('Order placed successfully!');
   };
 
@@ -82,6 +85,22 @@ const CheckoutForm = () => {
           <label className="block text-gray-400 text-sm mb-2">Your Phone Number<span className="text-[#DB4444]">*</span></label>
           <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} className="w-full bg-[#F5F5F5] rounded p-3 focus:outline-none" required />
         </div>
+
+        {/* Added Customization / Order Notes Textarea */}
+        <div>
+          <label className="block text-gray-400 text-sm mb-2">
+            Customization Notes <span className="text-gray-400 font-normal">(Optional)</span>
+          </label>
+          <textarea
+            name="orderNotes"
+            rows={3}
+            value={formData.orderNotes}
+            onChange={handleInputChange}
+            placeholder="Notes about your order, e.g. special instructions for customization or delivery."
+            className="w-full bg-[#F5F5F5] rounded p-3 focus:outline-none resize-none text-sm"
+          />
+        </div>
+
         <label className="flex items-center space-x-3 cursor-pointer select-none">
           <input type="checkbox" name="saveInfo" checked={formData.saveInfo} onChange={handleInputChange} className="w-5 h-5 accent-[#DB4444]" />
           <span className="text-sm font-medium">Save this information for faster check-out</span>
@@ -153,12 +172,12 @@ const CheckoutForm = () => {
           <p className="text-sm font-semibold text-gray-700">Select Shipping Area:</p>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="radio" name="shipping" checked={shippingMethod === 'inside'} onChange={() => setShippingMethod('inside')} className="accent-[#DB4444]" />
-              <span>Inside Dhaka (৳60)</span>
+              <input type="radio" name="shipping" checked={shippingMethod === 'inside'} onChange={() => setShippingMethod('inside')} className="accent-primary" />
+              <span>Inside Dhaka (৳70)</span>
             </label>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="radio" name="shipping" checked={shippingMethod === 'outside'} onChange={() => setShippingMethod('outside')} className="accent-[#DB4444]" />
-              <span>Outside Dhaka (৳120)</span>
+              <input type="radio" name="shipping" checked={shippingMethod === 'outside'} onChange={() => setShippingMethod('outside')} className="accent-primary" />
+              <span>Outside Dhaka (৳130)</span>
             </label>
           </div>
         </div>
@@ -180,7 +199,7 @@ const CheckoutForm = () => {
 
         <button
           type="submit"
-          className="bg-[#eb6e1b] text-white py-3 w-full rounded-br-3xl rounded-tl-3xl hover:bg-black transition-all font-semibold cursor-pointer flex items-center justify-center gap-2"
+          className="bg-primary text-white py-3 w-full rounded-br-3xl rounded-tl-3xl hover:bg-secondary transition-all font-semibold cursor-pointer flex items-center justify-center gap-2"
         >
           <GiShoppingBag className="text-xl" />
           <span>Order now</span>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { MdOutlineKeyboardArrowRight } from 'react-icons/md';
-import subBanner from '../../assets/images/subBanner.jpg';
+import subBanner from '../../assets/images/subBanner.png';
 
 const SubBanner = ({ title, pageName }) => {
   return (
@@ -14,7 +14,7 @@ const SubBanner = ({ title, pageName }) => {
           {title}
         </h1>
         <div className="flex items-center justify-center flex-wrap gap-1 md:gap-2 text-[11px] sm:text-xs md:text-sm font-medium">
-          <Link href="/" className="text-gray-600 hover:text-[#DB4444] transition-colors duration-200">
+          <Link href="/" className="text-gray-600 hover:text-secondary transition-colors duration-200">
             Home
           </Link>
           <MdOutlineKeyboardArrowRight size={14} className="text-gray-400 md:size-[16px]" />

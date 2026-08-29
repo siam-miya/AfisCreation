@@ -37,29 +37,29 @@ const ContactFormSection = () => {
         <div className="bg-white p-8 rounded shadow-[0_1px_13px_rgba(0,0,0,0.05)] flex flex-col justify-between space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#eb6e1b] rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white text-xl">
                 <FiPhone />
               </div>
               <h3 className="font-medium text-base">Call To Us</h3>
             </div>
             <div className="space-y-2 text-sm text-gray-800">
               <p>We are available 24/7, 7 days a week.</p>
-              <p className="font-medium">Phone: +8801611112222</p>
+              <p className="font-medium">Phone: 01804673487</p>
             </div>
           </div>
 
           <hr className="border-gray-300" />
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#eb6e1b] rounded-full flex items-center justify-center text-white text-xl">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white text-xl">
                 <TfiEmail />
               </div>
               <h3 className="font-medium text-base">Write To Us</h3>
             </div>
             <div className="space-y-2 text-sm text-gray-800">
               <p>Fill out our form and we will contact you within 24 hours.</p>
-              <p>Emails: customer@exclusive.com</p>
-              <p>Emails: support@exclusive.com</p>
+              <p>Emails: customer@afiscreation.com</p>
+              <p>Emails: support@afiscreation.com</p>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ const ContactFormSection = () => {
               placeholder="Your Name *"
               value={formData.name}
               onChange={handleInputChange}
-              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-[#eb6e1b] transition-all"
+              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-primary transition-all"
               required
             />
             <input
@@ -81,7 +81,7 @@ const ContactFormSection = () => {
               placeholder="Your Email *"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-[#eb6e1b] transition-all"
+              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-primary transition-all"
               required
             />
             <input
@@ -90,7 +90,7 @@ const ContactFormSection = () => {
               placeholder="Your Phone *"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-[#eb6e1b] transition-all"
+              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-primary transition-all"
               required
             />
           </div>
@@ -101,7 +101,7 @@ const ContactFormSection = () => {
               rows="6"
               value={formData.message}
               onChange={handleInputChange}
-              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-[#eb6e1b] transition-all resize-none h-full min-h-[150px]"
+              className="w-full bg-[#F5F5F5] rounded p-3 text-sm focus:outline-none border border-transparent focus:border-primary transition-all resize-none h-full min-h-[150px]"
               required
             ></textarea>
           </div>

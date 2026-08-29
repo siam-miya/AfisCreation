@@ -12,7 +12,6 @@ import wishlistIcon from "../../assets/icons/wishlist.svg";
 import cartIcon from "../../assets/icons/cart.png";
 import { FiUser, FiLogOut } from "react-icons/fi";
 import { toast } from 'react-toastify';
-import { RiUser3Line } from 'react-icons/ri';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import MenuSection from './MenuSection';
 
@@ -30,8 +29,32 @@ const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const dropdownRef = useRef(null);
 
+    const [user, setUser] = useState(null);
+
+    const loadUser = () => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setUser(parsedUser);
+            } catch (e) {
+                setUser(null);
+            }
+        } else {
+            setUser(null);
+        }
+    };
+
     useEffect(() => {
         setIsMounted(true);
+        loadUser();
+
+        const handleUserStateChanged = () => {
+            loadUser();
+        };
+
+        window.addEventListener('userStateChanged', handleUserStateChanged);
+
         const handleScroll = () => {
             if (window.scrollY > 30) {
                 setIsScrolled(true);
@@ -41,7 +64,10 @@ const Navbar = () => {
         };
 
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('userStateChanged', handleUserStateChanged);
+        };
     }, []);
 
     useEffect(() => {
@@ -87,8 +113,31 @@ const Navbar = () => {
     const wishlistCount = isMounted ? wishlist.length : 0;
 
     const handleLogOut = () => {
-        toast.success("successfully Logout your account");
+        localStorage.removeItem('user');
+        setUser(null);
+        window.dispatchEvent(new Event('userStateChanged'));
+        toast.success("Successfully logged out your account");
+        router.push('/login');
     };
+
+    const getUserInitial = () => {
+        if (user?.name) {
+            return user.name.charAt(0).toUpperCase();
+        }
+        if (user?.email) {
+            return user.email.charAt(0).toUpperCase();
+        }
+        return "U";
+    };
+
+    const handleProfileClick = (e) => {
+        if (!user) {
+            e.preventDefault();
+            router.push('/login');
+        }
+    };
+
+    const userProfilePic = user?.photoURL || user?.picture || user?.avatar;
 
     return (
         <nav className={`sticky top-0 w-full border-b border-b-[rgba(0,0,0,0.1)] bg-white/95 backdrop-blur-md z-[99] shadow-sm transition-all duration-300 ${isScrolled ? 'py-1.5 md:py-2' : 'py-3 md:py-5'}`}>
@@ -112,6 +161,7 @@ const Navbar = () => {
                                     height={90}
                                     width={180}
                                     alt='logo'
+                                    style={{ width: 'auto', height: 'auto' }}
                                     className="h-[38px] w-auto md:h-auto object-contain"
                                     priority
                                 />
@@ -119,13 +169,14 @@ const Navbar = () => {
                         </Link>
                         <div className="flex items-center gap-4 md:hidden z-10">
                             <Link href={"/cart"} className='relative p-1'>
-                                <Image src={cartIcon} height={22} width={22} alt="cart" />
+                                <Image src={cartIcon} height={22} width={22} alt="cart" style={{ width: 'auto', height: 'auto' }} />
                                 <span className='absolute -top-1 -right-1 bg-primary text-white text-[9px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center'>
                                     {cartCount}
                                 </span>
                             </Link>
                         </div>
                     </div>
+
                     <div
                         ref={dropdownRef}
                         className={`relative w-full md:flex-1 px-1 md:max-w-[650px] transition-all duration-300 ${isScrolled ? 'block md:hidden' : 'block'}`}
@@ -164,7 +215,13 @@ const Navbar = () => {
                                                     className="flex items-center gap-3 p-2 bg-white hover:bg-gray-50 transition-colors rounded-lg group"
                                                 >
                                                     <div className="w-10 h-10 relative flex-shrink-0 bg-[#F5F5F5] rounded-md overflow-hidden flex items-center justify-center">
-                                                        <Image src={product.thumbnail} height={100} width={100} alt={product.title} className="object-contain max-w-full max-h-full" />
+                                                        <Image 
+                                                            src={product.thumbnail} 
+                                                            alt={product.title} 
+                                                            fill 
+                                                            sizes="40px" 
+                                                            className="object-contain" 
+                                                        />
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
                                                         <span className="text-xs font-semibold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors font-poppins">
@@ -176,6 +233,7 @@ const Navbar = () => {
                                             ))}
                                         </div>
                                         <button
+                                            type="button"
                                             onClick={handleSearchSubmit}
                                             className="w-full text-center py-2.5 bg-gray-50 border-t text-xs font-bold text-gray-700 hover:text-white hover:bg-primary transition-all font-poppins cursor-pointer"
                                         >
@@ -190,40 +248,63 @@ const Navbar = () => {
                             </div>
                         )}
                     </div>
+
                     {isScrolled && (
                         <div className="hidden md:flex items-center justify-center flex-1">
                             <MenuSection />
                         </div>
                     )}
+
                     <div className='hidden md:flex items-center gap-6 lg:gap-8 text-black flex-shrink-0'>
                         <Link href={"/wishlist"} className='cursor-pointer relative group'>
-                            <Image src={wishlistIcon} height={24} width={24} alt="wishlist" />
+                            <Image src={wishlistIcon} height={24} width={24} alt="wishlist" style={{ width: 'auto', height: 'auto' }} />
                             <span className='absolute -top-3 -right-3 bg-primary text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center'>
                                 {wishlistCount}
                             </span>
                         </Link>
 
                         <Link href={"/cart"} className='cursor-pointer relative group'>
-                            <Image src={cartIcon} height={25} width={25} alt="cart" />
+                            <Image src={cartIcon} height={25} width={25} alt="cart" style={{ width: 'auto', height: 'auto' }} />
                             <span className='absolute -top-3 -right-3 bg-primary text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 flex items-center justify-center'>
                                 {cartCount}
                             </span>
                         </Link>
 
                         <div className='relative group pt-2 pb-2 -my-2'>
-                            <Link href={"/user/profile"} className='cursor-pointer block rounded-full hover:bg-primary hover:text-white transition-all p-2 border'>
-                                <RiUser3Line size={22} />
+                            <Link 
+                                href={user ? "/user/profile" : "/login"} 
+                                onClick={handleProfileClick}
+                                className='cursor-pointer flex items-center justify-center w-9 h-9 rounded-full overflow-hidden hover:ring-2 hover:ring-primary transition-all border border-gray-300'
+                            >
+                                {userProfilePic ? (
+                                    <img 
+                                        src={userProfilePic} 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                ) : user?.name || user?.email ? (
+                                    <div className="w-full h-full bg-primary text-white font-bold flex items-center justify-center text-sm">
+                                        {getUserInitial()}
+                                    </div>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-700 hover:bg-primary hover:text-white transition-colors">
+                                        <FiUser size={20} />
+                                    </div>
+                                )}
                             </Link>
-                            <div className='absolute right-0 top-12 mt-1 w-64 bg-black/80 backdrop-blur-md text-white rounded-lg p-4 shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 z-[999] flex flex-col gap-3'>
-                                <Link href={"/user/profile"} className='flex items-center gap-3 py-1.5 px-2 hover:bg-secondary rounded-md transition-colors text-sm font-light cursor-pointer'>
-                                    <FiUser size={20} />
-                                    <span>Manage My Account</span>
-                                </Link>
-                                <button onClick={handleLogOut} className='flex items-center gap-3 py-1.5 px-2 hover:bg-secondary rounded-md transition-colors text-sm font-light w-full text-left cursor-pointer'>
-                                    <FiLogOut size={20} />
-                                    <span>Logout</span>
-                                </button>
-                            </div>
+
+                            {user && (
+                                <div className='absolute right-0 top-12 mt-1 w-64 bg-black/80 backdrop-blur-md text-white rounded-lg p-4 shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-200 z-[999] flex flex-col gap-3'>
+                                    <Link href={"/user/profile"} className='flex items-center gap-3 py-1.5 px-2 hover:bg-secondary rounded-md transition-colors text-sm font-light cursor-pointer'>
+                                        <FiUser size={20} />
+                                        <span>Manage My Account</span>
+                                    </Link>
+                                    <button type="button" onClick={handleLogOut} className='flex items-center gap-3 py-1.5 px-2 hover:bg-secondary rounded-md transition-colors text-sm font-light w-full text-left cursor-pointer'>
+                                        <FiLogOut size={20} />
+                                        <span>Logout</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 

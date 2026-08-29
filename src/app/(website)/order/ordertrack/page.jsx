@@ -62,13 +62,13 @@ const OrderTrack = () => {
                     <div className="mb-10 flex items-center justify-between">
                         <Link
                             href="/products"
-                            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-[#eb6e1b] transition-all bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-100 group"
+                            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black hover:text-secondary transition-all bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-100 group"
                         >
                             <FiArrowLeft className="transform group-hover:-translate-x-1 transition-transform text-sm" />
                             <span>Back to Shop</span>
                         </Link>
                         <span className="flex items-center gap-1.5 text-xs font-bold bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-sm tracking-wide select-none">
-                            <CiDeliveryTruck size={18} className="text-[#eb6e1b] animate-bounce" /> Live Tracking
+                            <CiDeliveryTruck size={18} className="text-white animate-bounce" /> Live Tracking
                         </span>
                     </div>
 
@@ -77,7 +77,7 @@ const OrderTrack = () => {
                         <div className="bg-white rounded-br-4xl rounded-tl-4xl p-6 md:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.02)] border border-gray-100">
                             <div className="max-w-xl mx-auto text-center mb-8">
                                 <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-                                    Track Your  <span className="text-[#eb6e1b] relative inline-block">Order<span className="absolute left-0 bottom-1 w-full h-[4px] bg-[#eb6e1b]/20 rounded"></span></span>
+                                    Track Your  <span className="text-primary relative inline-block">Order<span className="absolute left-0 bottom-1 w-full h-[4px] bg-primary/20 rounded"></span></span>
                                 </h1>
                                 <p className="text-xs text-gray-400 mt-2 font-medium">
                                     Enter your order serial key below. Try testing with <span className="text-slate-700 font-bold underline cursor-pointer" onClick={() => setOrderNumber("CB-12345")}>CB-12345</span> or <span className="text-slate-700 font-bold underline cursor-pointer" onClick={() => setOrderNumber("CB-67890")}>CB-67890</span>.
@@ -85,7 +85,7 @@ const OrderTrack = () => {
                             </div>
 
                             <form onSubmit={handleSearch} className="max-w-xl mx-auto">
-                                <div className="relative flex flex-col sm:flex-row items-center gap-2.5 p-1.5 bg-gray-50 rounded-2xl border border-gray-200 focus-within:bg-white focus-within:border-[#eb6e1b] focus-within:ring-4 focus-within:ring-[#eb6e1b]/5 transition-all duration-300">
+                                <div className="relative flex flex-col sm:flex-row items-center gap-2.5 p-1.5 bg-gray-50 rounded-2xl border border-gray-200 focus-within:bg-white focus-within:border-secondary focus-within:ring-4 focus-within:ring-secondary/5 transition-all duration-300">
                                     <div className="relative w-full flex items-center">
                                         <FiSearch className="text-slate-400 text-lg absolute left-4" />
                                         <input
@@ -98,7 +98,7 @@ const OrderTrack = () => {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full sm:w-auto bg-[#eb6e1b] hover:bg-slate-950 text-white px-8 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-md shadow-orange-600/10 active:scale-[0.98] whitespace-nowrap"
+                                        className="w-full sm:w-auto bg-primary hover:bg-secondary text-white px-8 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-md shadow-orange-600/10 active:scale-[0.98] whitespace-nowrap"
                                     >
                                         Search
                                     </button>
@@ -110,10 +110,10 @@ const OrderTrack = () => {
                                 <div className="space-y-5 animate-fadeIn">
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                         {[
-                                            { label: "Parcel ID", val: orderData.id, icon: <FiPackage className="text-[#eb6e1b]" /> },
-                                            { label: "Logistics Partner", val: orderData.carrier, icon: <Truck size={14} className="text-[#eb6e1b]" /> },
-                                            { label: "Estimated Target", val: orderData.eta, icon: <Calendar size={14} className="text-[#eb6e1b]" />, highlight: true },
-                                            { label: "Current Status", val: orderData.status, icon: <FiMapPin className="text-[#eb6e1b]" />, isBadge: true }
+                                            { label: "Parcel ID", val: orderData.id, icon: <FiPackage className="text-primary" /> },
+                                            { label: "Logistics Partner", val: orderData.carrier, icon: <Truck size={14} className="text-primary" /> },
+                                            { label: "Estimated Target", val: orderData.eta, icon: <Calendar size={14} className="text-primary" />, highlight: true },
+                                            { label: "Current Status", val: orderData.status, icon: <FiMapPin className="text-primary" />, isBadge: true }
                                         ].map((item, idx) => (
                                             <div key={idx} className="bg-white p-4 rounded-bl-2xl rounded-tr-2xl border border-gray-100 shadow-sm flex items-center gap-3">
                                                 <div className="p-2.5 bg-slate-50 rounded-xl border border-gray-100">{item.icon}</div>
@@ -124,7 +124,7 @@ const OrderTrack = () => {
                                                             {item.val}
                                                         </span>
                                                     ) : (
-                                                        <span className={`text-xs font-bold tracking-tight truncate ${item.highlight ? "text-[#eb6e1b]" : "text-slate-800"}`}>
+                                                        <span className={`text-xs font-bold tracking-tight truncate ${item.highlight ? "text-primary" : "text-slate-800"}`}>
                                                             {item.val}
                                                         </span>
                                                     )}
@@ -146,7 +146,7 @@ const OrderTrack = () => {
                                                     }`}>
 
                                                     <div className={`absolute -left-[27px] w-3 h-3 rounded-full flex items-center justify-center transition-all duration-500 z-10 ${step.completed
-                                                            ? "bg-[#eb6e1b] ring-4 ring-orange-100"
+                                                            ? "bg-primary ring-4 ring-orange-100"
                                                             : "bg-gray-200 ring-4 ring-gray-50"
                                                         }`}>
                                                         {step.completed && <FiCheck className="text-[7px] text-white stroke-[4]" />}
@@ -154,11 +154,11 @@ const OrderTrack = () => {
 
                                                     <div className="space-y-0.5 min-w-0 flex-1 pr-4">
                                                         <div className="flex items-center gap-2">
-                                                            <h4 className={`text-xs font-extrabold tracking-tight ${step.current ? "text-[#eb6e1b]" : "text-slate-800"}`}>
+                                                            <h4 className={`text-xs font-extrabold tracking-tight ${step.current ? "text-primary" : "text-slate-800"}`}>
                                                                 {step.title}
                                                             </h4>
                                                             {step.current && (
-                                                                <span className="text-[9px] font-black uppercase bg-[#eb6e1b] text-white px-1.5 py-0.5 rounded tracking-wider animate-pulse">
+                                                                <span className="text-[9px] font-black uppercase bg-primary text-white px-1.5 py-0.5 rounded tracking-wider animate-pulse">
                                                                     Live
                                                                 </span>
                                                             )}
@@ -201,7 +201,7 @@ const OrderTrack = () => {
                     </div>
                     <div className="mt-12 text-center text-[11px] font-bold tracking-wide text-gray-400 uppercase flex items-center justify-center gap-1.5">
                         <span>Stuck somewhere?</span>
-                        <Link href={"/contact"} className="text-[#eb6e1b] hover:underline flex items-center gap-0.5">
+                        <Link href={"/contact"} className="text-primary hover:underline flex items-center gap-0.5">
                             Open Support Ticket <ChevronRight size={12} />
                         </Link>
                     </div>

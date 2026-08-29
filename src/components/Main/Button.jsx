@@ -16,7 +16,7 @@ const Button = ({ children, type = "button", TagName = "button", ...props }) => 
         text-[14px] md:text-[16px] 
         leading-6 
         hover:text-white 
-        hover:bg-black 
+        hover:bg-secondary 
         transition-all 
         rounded-tr-2xl rounded-bl-2xl 
         md:rounded-tr-4xl md:rounded-bl-4xl'

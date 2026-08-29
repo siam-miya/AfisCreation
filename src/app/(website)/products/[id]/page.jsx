@@ -3,6 +3,10 @@ import SectionHeading from "@/components/Main/SectionHeading";
 import SubBanner from "@/components/Main/SubBanner";
 import RelatedProductsSlider from "@/components/Main/RelatedProductsSlider"; 
 
+export const metadata = {
+  title: "Product Details || Afis Creation",
+  description: "Afis Creation product details page",
+};
 const ProductDetailsPage = async ({ params }) => {
   const { id } = await params;
   const res = await fetch("https://dummyjson.com/products");

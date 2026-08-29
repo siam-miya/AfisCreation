@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import footer_icon from "../../../public/footerLogo.png"
+import footer_icon from "../../../public/navbarLogo.png"
 import arrow_right from "../../assets/icons/arrow_right.svg"
 import Link from 'next/link'
 
@@ -36,17 +36,41 @@ const Footer = () => {
               </form>
             </div>
             <div className='flex items-center justify-start gap-6 pt-2'>
+              <a
+                href="https://www.facebook.com/afiascreation"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="fill-white hover:fill-blue-500 transition-colors duration-300 cursor-pointer"
+                >
+                  <path d="M13 10H17.5L17 12H13V21H11V12H7V10H11V8.128C11 6.345 11.186 5.698 11.534 5.046C11.875 4.40181 12.4018 3.87501 13.046 3.534C13.698 3.186 14.345 3 16.128 3C16.65 3 17.108 3.05 17.5 3.15V5H16.128C14.804 5 14.401 5.078 13.99 5.298C13.686 5.46 13.46 5.686 13.298 5.99C13.078 6.401 13 6.804 13 8.128V10Z" />
+                </svg>
+              </a>
+              <a href="https://www.instagram.com/afiafifa_afi/?hl=en"  target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block">
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="fill-white hover:fill-blue-500 transition-colors duration-300 cursor-pointer"
+                className="text-white hover:text-[#E1306C] stroke-current transition-all duration-300 ease-in-out cursor-pointer hover:scale-110"
               >
-                <path d="M13 10H17.5L17 12H13V21H11V12H7V10H11V8.128C11 6.345 11.186 5.698 11.534 5.046C11.875 4.40181 12.4018 3.87501 13.046 3.534C13.698 3.186 14.345 3 16.128 3C16.65 3 17.108 3.05 17.5 3.15V5H16.128C14.804 5 14.401 5.078 13.99 5.298C13.686 5.46 13.46 5.686 13.298 5.99C13.078 6.401 13 6.804 13 8.128V10Z" />
+                <path d="M17 3H7C5.93913 3 4.92172 3.42143 4.17157 4.17157C3.42143 4.92172 3 5.93913 3 7V17C3 18.0609 3.42143 19.0783 4.17157 19.8284C4.92172 20.5786 5.93913 21 7 21H17C18.0609 21 19.0783 20.5786 19.8284 19.8284C20.5786 19.0783 21 18.0609 21 17V7C21 5.93913 20.5786 4.92172 19.8284 4.17157C19.0783 3.42143 18.0609 3 17 3Z" strokeWidth="1.5" strokeLinejoin="round" />
+                <path d="M12 16C13.0609 16 14.0783 15.5786 14.8284 14.8284C15.5786 14.0783 16 13.0609 16 12C16 10.9391 15.5786 9.92172 14.8284 9.17157C14.0783 8.42143 13.0609 8 12 8C10.9391 8 9.92172 8.42143 9.17157 9.17157C8.42143 9.92172 8 10.9391 8 12C8 13.0609 8.42143 14.0783 9.17157 14.8284C9.92172 15.5786 10.9391 16 12 16V16Z" strokeWidth="1.5" strokeLinejoin="round" />
+                <path d="M17.5 7.5C17.7652 7.5 18.0196 7.39464 18.2071 7.20711C18.3946 7.01957 18.5 6.76522 18.5 6.5C18.5 6.23478 18.3946 5.98043 18.2071 5.79289C18.0196 5.60536 17.7652 5.5 17.5 5.5C17.2348 5.5 16.9804 5.60536 16.7929 5.79289C16.6054 5.98043 16.5 6.23478 16.5 6.5C16.5 6.76522 16.6054 7.01957 16.7929 7.20711C16.9804 7.39464 17.2348 7.5 17.5 7.5Z" className="fill-current stroke-none" />
               </svg>
-              <svg
+              </a>
+             
+               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
@@ -69,18 +93,6 @@ const Footer = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-white hover:text-[#E1306C] stroke-current transition-all duration-300 ease-in-out cursor-pointer hover:scale-110"
-              >
-                <path d="M17 3H7C5.93913 3 4.92172 3.42143 4.17157 4.17157C3.42143 4.92172 3 5.93913 3 7V17C3 18.0609 3.42143 19.0783 4.17157 19.8284C4.92172 20.5786 5.93913 21 7 21H17C18.0609 21 19.0783 20.5786 19.8284 19.8284C20.5786 19.0783 21 18.0609 21 17V7C21 5.93913 20.5786 4.92172 19.8284 4.17157C19.0783 3.42143 18.0609 3 17 3Z" strokeWidth="1.5" strokeLinejoin="round" />
-                <path d="M12 16C13.0609 16 14.0783 15.5786 14.8284 14.8284C15.5786 14.0783 16 13.0609 16 12C16 10.9391 15.5786 9.92172 14.8284 9.17157C14.0783 8.42143 13.0609 8 12 8C10.9391 8 9.92172 8.42143 9.17157 9.17157C8.42143 9.92172 8 10.9391 8 12C8 13.0609 8.42143 14.0783 9.17157 14.8284C9.92172 15.5786 10.9391 16 12 16V16Z" strokeWidth="1.5" strokeLinejoin="round" />
-                <path d="M17.5 7.5C17.7652 7.5 18.0196 7.39464 18.2071 7.20711C18.3946 7.01957 18.5 6.76522 18.5 6.5C18.5 6.23478 18.3946 5.98043 18.2071 5.79289C18.0196 5.60536 17.7652 5.5 17.5 5.5C17.2348 5.5 16.9804 5.60536 16.7929 5.79289C16.6054 5.98043 16.5 6.23478 16.5 6.5C16.5 6.76522 16.6054 7.01957 16.7929 7.20711C16.9804 7.39464 17.2348 7.5 17.5 7.5Z" className="fill-current stroke-none" />
-              </svg>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
                 className="text-white hover:text-[#0A66C2] fill-current transition-all duration-300 ease-in-out cursor-pointer hover:scale-110"
               >
                 <path d="M11.5 9.05C12.417 8.113 13.611 7.5 15 7.5C16.4587 7.5 17.8576 8.07946 18.8891 9.11091C19.9205 10.1424 20.5 11.5413 20.5 13V20.5H18.5V13C18.5 12.0717 18.1313 11.1815 17.4749 10.5251C16.8185 9.86875 15.9283 9.5 15 9.5C14.0717 9.5 13.1815 9.86875 12.5251 10.5251C11.8687 11.1815 11.5 12.0717 11.5 13V20.5H9.5V8H11.5V9.05ZM4.5 6C4.10218 6 3.72064 5.84196 3.43934 5.56066C3.15804 5.27936 3 4.89782 3 4.5C3 4.10218 3.15804 3.72064 3.43934 3.43934C3.72064 3.15804 4.10218 3 4.5 3C4.89782 3 5.27936 3.15804 5.56066 3.43934C5.84196 3.72064 6 4.10218 6 4.5C6 4.89782 5.84196 5.27936 5.56066 5.56066C5.27936 5.84196 4.89782 6 4.5 6ZM3.5 8H5.5V20.5H3.5V8Z" />
@@ -91,33 +103,33 @@ const Footer = () => {
             <h2 className='text-white font-medium font-poppins text-[20px] leading-7 border-b border-gray-800 pb-2 md:border-b-0 md:pb-0'>Support</h2>
             <div className="pt-4 md:pt-6">
               <p className='text-[16px] leading-6 text-white pb-4 font-poppins'>Gulshan-2, Dhaka, Bangladesh</p>
-              <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all break-all' href={"/"}>classybazar@gmail.com</Link>
-              <p className='text-[16px] leading-6 text-white font-poppins pt-4 hover:text-[#eb6e1b] hover:font-semibold transition-all cursor-pointer'>01925909902</p>
+              <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all break-all' href={"/"}>afiscreation@gmail.com</Link>
+              <p className='text-[16px] leading-6 text-white font-poppins pt-4 hover:text-secondary hover:font-semibold transition-all cursor-pointer'>01804673487</p>
             </div>
           </div>
           <div>
             <h2 className='text-white font-medium font-poppins text-[20px] leading-7 border-b border-gray-800 pb-2 md:border-b-0 md:pb-0'>Account</h2>
             <ul className="pt-4 md:pt-6">
               <li>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/"}>My Account</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/"}>My Account</Link>
               </li>
               <div className='flex items-center gap-2 py-4'>
                 <li>
-                  <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/login"}>Login</Link>
+                  <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/login"}>Login</Link>
                 </li>
                 <span className='text-white'>/</span>
                 <li>
-                  <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/login"}>Register</Link>
+                  <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/login"}>Register</Link>
                 </li>
               </div>
               <li>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/cart"}>Cart</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/cart"}>Cart</Link>
               </li>
               <li className='py-4'>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/Wishlist"}>Wishlist</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/Wishlist"}>Wishlist</Link>
               </li>
               <li>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/Shop"}>Shop</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/Shop"}>Shop</Link>
               </li>
             </ul>
           </div>
@@ -125,16 +137,16 @@ const Footer = () => {
             <h2 className='text-white font-medium font-poppins text-[20px] leading-7 border-b border-gray-800 pb-2 md:border-b-0 md:pb-0'>Quick Link</h2>
             <ul className="pt-4 md:pt-6">
               <li>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/"}>Privacy Policy</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/"}>Privacy Policy</Link>
               </li>
               <li className='py-4'>
-                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/"}>Terms Of Use</Link>
+                <Link className='text-[16px] leading-6 text-white font-poppins hover:text-secondary hover:font-semibold transition-all' href={"/"}>Terms Of Use</Link>
               </li>
               <li>
-                <Link className='text-[16px] leading-6 text-white hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/"}>FAQ</Link>
+                <Link className='text-[16px] leading-6 text-white hover:text-secondary hover:font-semibold transition-all' href={"/"}>FAQ</Link>
               </li>
               <li className='pt-4'>
-                <Link className='text-[16px] leading-6 text-white hover:text-[#eb6e1b] hover:font-semibold transition-all' href={"/Contact"}>Contact</Link>
+                <Link className='text-[16px] leading-6 text-white hover:text-secondary hover:font-semibold transition-all' href={"/Contact"}>Contact</Link>
               </li>
             </ul>
           </div>
@@ -142,7 +154,7 @@ const Footer = () => {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-1 mt-8 md:mt-20 pt-6 border-t border-gray-900 text-center font-poppins">
           <span className='text-gray-500 hidden sm:inline'>&copy;</span>
           <span className='text-gray-500 text-[14px] sm:text-[16px] leading-6'>
-            Copyright <span className="sm:hidden">&copy;</span> <Link className={'text-[#eb6e1b] hover:text-white'} href={"/"}>Classy Bazar</Link> {currentYear}.
+            Copyright <span className="sm:hidden">&copy;</span> <Link className={'text-secondary hover:text-white'} href={"/"}>Afis Creation</Link> {currentYear}.
           </span>
           <span className="text-gray-500 text-[14px] sm:text-[16px] leading-6 sm:ml-1">All rights reserved.</span>
         </div>

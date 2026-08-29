@@ -2,11 +2,8 @@ import ContactFormSection from "@/components/Main/ContacFormSection";
 import SubBanner from "@/components/Main/SubBanner";
 
 export const metadata = {
-  title: "Contact || ClassyBazar",
-  description: "classyBazar contact page",
-  icons: {
-    icon: "/favContact.png",
-  },
+  title: "Contact || Afis Creation",
+  description: "Afis Creation contact page",
 };
 const Contact = () => {
   return (

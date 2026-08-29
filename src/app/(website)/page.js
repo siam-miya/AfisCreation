@@ -8,6 +8,11 @@ import OurSupport from '@/components/Main/OurSupport'
 import RadioExprience from '@/components/Main/RadioExprience'
 import React from 'react'
 
+export const metadata = {
+  title: "Afis Creation",
+  description: "best abaya in bangladesh",
+};
+
 const HomePage = () => {
   return (
    <>

@@ -8,10 +8,10 @@ import { IoClose } from "react-icons/io5";
 
 const MultiChatFAB = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const whatsappNumber = "8801793293600";
-  const messengerUsername = "amarClassyBazar";
-  const phoneNumber = "+8801793293600";
-  const emailAddress = "siammiya2024@gmail.com";
+  const whatsappNumber = "01804673487";
+  const messengerUsername = "afiscreation";
+  const phoneNumber = "01804673487";
+  const emailAddress = "afiscreation@gmail.com";
 
   const actions = [
     {

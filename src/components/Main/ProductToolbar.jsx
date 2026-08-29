@@ -52,11 +52,11 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
           <button 
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className={`flex items-center gap-2 font-medium transition-all py-1 px-2 rounded cursor-pointer ${
-              isFilterOpen ? "text-[#eb6e1b]" : "text-white hover:text-[#eb6e1b]"
+              isFilterOpen ? "text-primary" : "text-white hover:text-primary"
             }`}
           >
             <SlidersHorizontal size={18} />
-            <span className="text-white font-semibold hover:text-[#eb6e1b] text-sm md:text-base">Filter</span>
+            <span className="text-white font-semibold hover:text-primary text-sm md:text-base">Filter</span>
           </button>
 
           {isFilterOpen && (
@@ -78,35 +78,43 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
                   min={MIN_PRICE_LIMIT}
                   max={MAX_PRICE_LIMIT}
                   onChange={(values) => setPriceValues(values)}
-                  renderTrack={({ props, children }) => (
-                    <div
-                      onMouseDown={props.onMouseDown}
-                      onTouchStart={props.onTouchStart}
-                      className="w-full flex h-1.5"
-                    >
+                  renderTrack={({ props, children }) => {
+                    const { key, ...restProps } = props;
+                    return (
                       <div
-                        ref={props.ref}
-                        className="h-1.5 w-full rounded-full self-center"
-                        style={{
-                          background: getTrackBackground({
-                            values: priceValues,
-                            colors: ["#eee", "#eb6e1b", "#eee"],
-                            min: MIN_PRICE_LIMIT,
-                            max: MAX_PRICE_LIMIT,
-                          }),
-                        }}
+                        key={key}
+                        onMouseDown={restProps.onMouseDown}
+                        onTouchStart={restProps.onTouchStart}
+                        className="w-full flex h-1.5"
                       >
-                        {children}
+                        <div
+                          ref={restProps.ref}
+                          className="h-1.5 w-full rounded-full self-center"
+                          style={{
+                            background: getTrackBackground({
+                              values: priceValues,
+                              colors: ["#fff", "#a77d48", "#fff"],
+                              min: MIN_PRICE_LIMIT,
+                              max: MAX_PRICE_LIMIT,
+                            }),
+                          }}
+                        >
+                          {children}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  renderThumb={({ props }) => (
-                    <div
-                      {...props}
-                      className="h-4 w-1.5 bg-[#eb6e1b] rounded focus:outline-none focus:ring-1 focus:ring-[#eb6e1b]"
-                      style={{ ...props.style }}
-                    />
-                  )}
+                    );
+                  }}
+                  renderThumb={({ props }) => {
+                    const { key, ...restProps } = props;
+                    return (
+                      <div
+                        key={key}
+                        {...restProps}
+                        className="h-4 w-1.5 bg-primary rounded focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                        style={{ ...restProps.style }}
+                      />
+                    );
+                  }}
                 />
 
                 <div className="flex items-center gap-1 font-poppins text-gray-500 text-xs sm:text-sm mt-4">
@@ -120,7 +128,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
               <div className="flex items-center justify-start mt-5 pt-4 border-t border-gray-50">
                 <button 
                   onClick={handlePriceFilterSubmit}
-                  className="bg-[#eb6e1b] text-white hover:bg-black font-semibold px-5 py-2 rounded-lg text-sm transition-all shadow-sm font-poppins cursor-pointer"
+                  className="bg-primary text-white hover:bg-black font-semibold px-5 py-2 rounded-lg text-sm transition-all shadow-sm font-poppins cursor-pointer"
                 >
                   Filter
                 </button>
@@ -134,7 +142,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
         <div className="hidden md:flex items-center gap-4">
           <button 
             onClick={() => handleParamChange("view", "4")}
-            className={`transition-colors cursor-pointer ${currentView === "4" ? "text-[#eb6e1b]" : "text-white hover:text-[#eb6e1b]"}`}
+            className={`transition-colors cursor-pointer ${currentView === "4" ? "text-primary" : "text-white hover:text-primary"}`}
             title="4 Grid View"
           >
             <TfiLayoutGrid4Alt size={20} />
@@ -142,7 +150,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
 
           <button 
             onClick={() => handleParamChange("view", "5")}
-            className={`flex items-center gap-[2px] transition-colors cursor-pointer ${currentView === "5" ? "text-[#eb6e1b]" : "text-white hover:text-[#eb6e1b]"}`}
+            className={`flex items-center gap-[2px] transition-colors cursor-pointer ${currentView === "5" ? "text-primary" : "text-white hover:text-primary"}`}
             title="5 Grid View"
           >
             <span className="grid grid-cols-3 gap-[2px] w-[11px] h-[11px]">
@@ -162,12 +170,12 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
           </button>
         </div>
 
-        <div className="md:hidden text-xs text-[#eb6e1b] select-none font-medium">
+        <div className="md:hidden text-xs text-primary select-none font-medium">
           Showing 1–{currentShowing} of {totalProducts}
         </div>
       </div>
 
-      <div className="hidden md:block text-sm text-[#eb6e1b] select-none font-medium">
+      <div className="hidden md:block text-sm text-white select-none font-medium">
         Showing 1–{currentShowing} of {totalProducts} products
       </div>
 

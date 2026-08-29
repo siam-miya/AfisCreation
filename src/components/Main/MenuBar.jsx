@@ -5,7 +5,7 @@ import MenuSection from "./MenuSection"
 import Link from "next/link"
 import Image from 'next/image'
 import { RxHamburgerMenu, RxCross2 } from "react-icons/rx"
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useDrawerStore } from '@/store/useDrawerStore'
 import logo from "../../../public/navbarLogo.png"
 import wishlistIcon from "../../assets/icons/wishlist.svg"
@@ -58,6 +58,7 @@ const categoryIcons = {
 
 const MenuBar = () => {
     const pathname = usePathname();
+    const router = useRouter();
     const isHomePage = pathname === '/';
     const cart = useCartStore((state) => state.cart);
     const wishlist = useWishlistStore((state) => state.wishlist);
@@ -67,6 +68,11 @@ const MenuBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    // Dropdown state for click-based toggle on all pages
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    
+    const dropdownRef = useRef(null);
     const drawerRef = useRef(null);
 
     useEffect(() => {
@@ -97,28 +103,41 @@ const MenuBar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Close dropdown or drawer when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (drawerRef.current && !drawerRef.current.contains(event.target)) {
                 closeDrawer();
             }
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                if (pathname !== '/') {
+                    setIsDropdownOpen(false);
+                }
+            }
         };
-        if (isDrawerOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
+        document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [isDrawerOpen, closeDrawer]);
-
-    useEffect(() => {
-        closeDrawer();
-    }, [pathname, closeDrawer]);
+    }, [closeDrawer, pathname]);
 
     const cartCount = isMounted ? cart.reduce((total, item) => total + item.quantity, 0) : 0;
     const wishlistCount = isMounted ? wishlist.length : 0;
 
     const handleLogOut = () => {
-        toast.success("successfully Logout your account")
-    }
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('userStateChanged'));
+        toast.success("Successfully logged out your account");
+        router.push('/login');
+    };
+
+    // Check auth for Order Track
+    const handleOrderTrackClick = (e) => {
+        const user = localStorage.getItem('user');
+        if (!user) {
+            e.preventDefault();
+            toast.error("Please sign in to track your order!");
+            router.push('/signup');
+        }
+    };
 
     return (
         <>
@@ -127,21 +146,25 @@ const MenuBar = () => {
                     <div className={`flex items-center justify-between relative transition-all duration-300 ${isScrolled ? "py-2.5" : ""}`}>
                         <div className="w-[220px] lg:w-[270px] flex-shrink-0 flex items-center">
                             {!isScrolled ? (
-                                <div className="w-full z-20 group relative self-start">
-                                    <h2 className="bg-primary text-white py-3.5 px-4 flex items-center justify-between gap-2 font-bold text-sm select-none cursor-pointer rounded-t-md">
+                                <div className="w-full z-20 relative self-start" ref={dropdownRef}>
+                                    <h2 
+                                        onClick={() => setIsDropdownOpen(prev => !prev)}
+                                        className="bg-primary text-white py-3.5 px-4 flex items-center justify-between gap-2 font-bold text-sm select-none cursor-pointer rounded-t-md"
+                                    >
                                         <span className="flex items-center gap-2 font-poppins">
                                             <RxHamburgerMenu size={18} />
                                             Browse Categories
                                         </span>
-                                        <span className={`${isHomePage ? 'block' : 'block group-hover:hidden'}`}>
-                                            <MdOutlineKeyboardArrowDown size={20} />
-                                        </span>
-                                        <span className={`${isHomePage ? 'hidden' : 'hidden group-hover:block'}`}>
-                                            <MdOutlineKeyboardArrowUp size={20} />
+                                        <span>
+                                            {isDropdownOpen ? (
+                                                <MdOutlineKeyboardArrowUp size={20} />
+                                            ) : (
+                                                <MdOutlineKeyboardArrowDown size={20} />
+                                            )}
                                         </span>
                                     </h2>
 
-                                    <ul className={`w-full bg-white border border-gray-200 shadow-lg p-2 flex flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] max-h-[450px] overflow-y-auto scrollbar-none ${isHomePage ? 'block' : 'hidden group-hover:flex'}`}>
+                                    <ul className={`w-full bg-white border border-gray-200 shadow-lg p-2 flex flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] max-h-[450px] overflow-y-auto scrollbar-none ${isDropdownOpen ? 'flex' : 'hidden'}`}>
                                         {loading ? (
                                             <div className="flex flex-col items-center py-5 gap-2">
                                                 <Spinner size="md" color="danger" />
@@ -155,6 +178,9 @@ const MenuBar = () => {
                                                     slug={cat.slug}
                                                     categoryIcon={categoryIcons[cat.slug] || <FaShoppingBag size={18} />}
                                                     rightIcon={true}
+                                                    onClick={() => {
+                                                        if (pathname !== '/') setIsDropdownOpen(false);
+                                                    }}
                                                 />
                                             ))
                                         )}
@@ -172,7 +198,7 @@ const MenuBar = () => {
 
                         <div className="flex-shrink-0 min-w-[120px] flex justify-end items-center">
                             {!isScrolled ? (
-                                <Link href={"/order/ordertrack"}>
+                                <Link href={"/order/ordertrack"} onClick={handleOrderTrackClick}>
                                     <button className="text-white font-bold text-sm hover:bg-secondary transition-colors cursor-pointer py-2.5 px-5 bg-primary rounded-md animate-fadeIn font-poppins">
                                         Order Track
                                     </button>
@@ -299,7 +325,11 @@ const MenuBar = () => {
                     <span>CATEGORIES</span>
                 </button>
 
-                <Link href="/order/ordertrack" className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] relative ${pathname === '/ordertrack' ? "text-black font-semibold" : ""}`}>
+                <Link 
+                    href="/order/ordertrack" 
+                    onClick={handleOrderTrackClick}
+                    className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] relative ${pathname === '/ordertrack' ? "text-black font-semibold" : ""}`}
+                >
                     <div className="relative flex items-center justify-center">
                         <TbTruckDelivery size={22} className={pathname === '/ordertrack' ? "text-black" : "text-white"} />
                     </div>

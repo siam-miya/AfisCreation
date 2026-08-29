@@ -3,7 +3,7 @@ import CheckoutForm from '@/components/Main/CheckoutForm';
 import SubBanner from '@/components/Main/SubBanner';
 
 export const metadata = {
-  title: 'Checkout | classybazar e-commarce',
+  title: 'Checkout || Afis Creation',
   description: 'Provide your billing details and complete your purchase securely.',
 };
 

@@ -82,7 +82,7 @@ const CartPage = () => {
                             </div>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="px-4 h-full bg-[#eb6e1b] text-white hover:bg-orange-600 transition-colors font-medium flex items-center justify-center cursor-pointer text-lg"
+                              className="px-4 h-full bg-primary text-white hover:bg-secondary transition-colors font-medium flex items-center justify-center cursor-pointer text-lg"
                             >
                               +
                             </button>
@@ -138,7 +138,7 @@ const CartPage = () => {
                         </div>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="px-2.5 h-full bg-[#eb6e1b] text-white hover:bg-orange-600 flex items-center justify-center cursor-pointer text-sm"
+                          className="px-2.5 h-full bg-primary text-white hover:bg-orange-600 flex items-center justify-center cursor-pointer text-sm"
                         >
                           +
                         </button>
@@ -172,7 +172,7 @@ const CartPage = () => {
                         name="shipping"
                         checked={shippingMethod === 'inside'}
                         onChange={() => setShippingMethod('inside')}
-                        className="accent-[#eb6e1b] w-4 h-4"
+                        className="accent-primary w-4 h-4"
                       />
                       <span className="group-hover:text-black transition-colors">Inside Dhaka (৳70)</span>
                     </label>
@@ -182,7 +182,7 @@ const CartPage = () => {
                         name="shipping"
                         checked={shippingMethod === 'outside'}
                         onChange={() => setShippingMethod('outside')}
-                        className="accent-[#eb6e1b] w-4 h-4"
+                        className="accent-primary w-4 h-4"
                       />
                       <span className="group-hover:text-black transition-colors">Outside Dhaka (৳130)</span>
                     </label>
@@ -191,12 +191,12 @@ const CartPage = () => {
 
                 <div className="flex justify-between font-bold text-base md:text-lg mb-6">
                   <span>Total:</span>
-                  <span className="text-[#eb6e1b]">৳{totalCost.toFixed(2)}</span>
+                  <span className="text-primary">৳{totalCost.toFixed(2)}</span>
                 </div>
 
                 <div>
                   <Link href={"/checkout"} className="block w-full">
-                    <button className="w-full flex items-center justify-center gap-2 bg-[#eb6e1b] text-white py-3 rounded-md font-medium hover:bg-black transition-colors duration-300 cursor-pointer shadow-sm">
+                    <button className="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-md font-medium hover:bg-secondary transition-colors duration-300 cursor-pointer shadow-sm">
                       <IoBagCheckOutline size={19} />
                       <span>Proceed to checkout</span>
                     </button>

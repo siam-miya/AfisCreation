@@ -50,7 +50,7 @@ const Pagination = ({ totalProducts, limit, currentPage }) => {
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`p-2 rounded-lg text-[#777777] hover:text-[#eb6e1b] transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed`}
+        className={`p-2 rounded-lg text-[#777777] hover:text-primary transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed`}
       >
         <ChevronLeft size={20} />
       </button>
@@ -70,8 +70,8 @@ const Pagination = ({ totalProducts, limit, currentPage }) => {
             key={`page-${page}`}
             onClick={() => handlePageChange(page)}
             className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${isActive
-                ? "bg-[#eb6e1b] text-white font-semibold"
-                : "text-black hover:text-[#eb6e1b]"
+                ? "bg-primary text-white font-semibold"
+                : "text-black hover:text-secondary"
               }`}
           >
             {page}
@@ -81,7 +81,7 @@ const Pagination = ({ totalProducts, limit, currentPage }) => {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`p-2 rounded-lg text-[#777777] hover:text-[#eb6e1b] transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed`}
+        className={`p-2 rounded-lg text-[#777777] hover:text-secondary transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed`}
       >
         <ChevronRight size={20} />
       </button>

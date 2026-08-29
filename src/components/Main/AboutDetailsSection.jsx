@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import aboutImage from "../assets/images/about.png";
+import aboutImage from "../../assets/images/about.png";
 import { BiSolidOffer } from "react-icons/bi";
 import { FaStar } from "react-icons/fa";
 import { AiFillFire } from "react-icons/ai";
@@ -15,13 +15,10 @@ const AboutDetailsSection = () => {
           </h1>
           <div className="space-y-4 text-gray-600 text-base leading-relaxed">
             <p>
-              Welcome to <strong>Classy Bazar</strong>! We are a trusted online shopping platform in Bangladesh,
-              bringing essential and trendy products together under one roof with budget-friendly prices
-              and reliable customer service.
+              Welcome to <strong>Afis Creation</strong>! We are a dedicated modest fashion and borkha brand in Bangladesh, bringing elegance, comfort, and premium quality together in stylish abayas and Islamic wear for modern women.
             </p>
             <p>
-              Our goal is not just selling products; we believe in building long-term relationships
-              with every single customer by maintaining proper quality, correct pricing, and on-time delivery.
+              Our goal is not just selling clothing; we believe in empowering modest fashion choices by maintaining superior fabric quality, exquisite designs, and affordable pricing for every single customer.
             </p>
           </div>
         </div>
@@ -36,7 +33,7 @@ const AboutDetailsSection = () => {
           <div className="text-2xl"><AiFillFire /></div>
           <h3 className="text-lg font-semibold text-black">Our Purpose</h3>
           <p className="text-sm text-gray-600 leading-relaxed">
-            We believe that online shopping should be easy, secure, and hassle-free. That is why we carefully select every single product keeping quality, practical needs, and customer satisfaction in mind.
+            We believe that modest dressing should be graceful, comfortable, and accessible. That is why we carefully design and select every single piece keeping premium fabrics, modern trends, and comfort in mind.
           </p>
         </div>
 
@@ -44,31 +41,31 @@ const AboutDetailsSection = () => {
           <div className="text-2xl"><BiSolidOffer /></div>
           <h3 className="text-lg font-semibold text-black">What We Offer</h3>
           <ul className="text-sm text-gray-600 space-y-1.5 list-disc pl-4">
-            <li>Lifestyle Products</li>
-            <li>Electronics & Gadgets</li>
-            <li>Home & Kitchen Items</li>
-            <li>Fashion & Accessories</li>
-            <li>Islamic Decor & Travel Gear</li>
+            <li>Designer Abayas</li>
+            <li>Premium Borkha Collections</li>
+            <li>Hijabs & Niqabs</li>
+            <li>Modest Party Wear</li>
+            <li>Comfortable Everyday Wear</li>
           </ul>
         </div>
 
         <div className="bg-gray-100 p-6 rounded-xl space-y-3">
           <div className="text-2xl"><FaStar /></div>
-          <h3 className="text-lg font-semibold text-black">Why Classy Bazar?</h3>
+          <h3 className="text-lg font-semibold text-black">Why Afis Creation?</h3>
           <ul className="text-sm text-gray-600 space-y-1.5">
-            <li className="flex items-center gap-2">✅ 100% Quality Checked</li>
-            <li className="flex items-center gap-2">✅ Reliable Delivery Service</li>
+            <li className="flex items-center gap-2">✅ Premium Fabric Quality</li>
+            <li className="flex items-center gap-2">✅ Elegant & Unique Designs</li>
             <li className="flex items-center gap-2">✅ Cash on Delivery Facility</li>
-            <li className="flex items-center gap-2">✅ Fast Customer Support</li>
+            <li className="flex items-center gap-2">✅ Nationwide Fast Delivery</li>
           </ul>
         </div>
 
       </div>
 
       <div className="bg-gray-100 rounded-2xl p-8 md:p-12 text-center w-full mx-auto space-y-4">
-        <h3 className="text-xl font-bold text-[#eb6e1b]">Our Promise</h3>
+        <h3 className="text-xl font-bold text-primary">Our Promise</h3>
         <p className="text-black max-w-xl mx-auto text-sm md:text-base">
-          Authentic products, fair pricing, timely delivery, and respect for our customers. Your trust is our greatest asset. We strive to deliver your products across Bangladesh in the fastest possible time.
+          Authentic modest styles, comfortable fabrics, fair pricing, and respect for our customers. Your trust is our greatest asset. We strive to deliver your favorite borkha and abaya collections across Bangladesh in the fastest possible time.
         </p>
       </div>
 

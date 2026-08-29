@@ -30,10 +30,10 @@ const Topbar = () => {
         <div className="hidden md:block w-20"></div>
 
         <div className="flex-1 text-center text-xs md:text-sm tracking-wide leading-5">
-          <span>Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!</span>
+          <span>Flash Sale For All Modest Abayas And Free Express Delivery - OFF 50%!</span>
           <Link
             href="/products"
-            className="font-semibold underline ml-2 transition-colors duration-200 hover:text-blue-400"
+            className="font-semibold underline ml-2 transition-colors duration-200 hover:text-secondary"
           >
             ShopNow
           </Link>
@@ -52,7 +52,7 @@ const Topbar = () => {
           </button>
 
           {open && (
-            <div className="absolute right-0 top-full mt-2 bg-white text-black rounded-md shadow-lg overflow-hidden min-w-[110px] z-50">
+            <div className="absolute right-0 top-full mt-2 bg-white text-black rounded-md shadow-lg overflow-hidden min-w-[110px] z-500">
               {languages.map((item) => (
                 <button
                   key={item}
