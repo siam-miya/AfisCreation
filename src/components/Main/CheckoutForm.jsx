@@ -89,7 +89,7 @@ const CheckoutForm = () => {
         {/* Added Customization / Order Notes Textarea */}
         <div>
           <label className="block text-gray-400 text-sm mb-2">
-            Customization Notes <span className="text-gray-400 font-normal">(Optional)</span>
+           Add a note to customize your product <span className="text-gray-400 font-normal">(Optional)</span>
           </label>
           <textarea
             name="orderNotes"

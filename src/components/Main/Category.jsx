@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SectionHeading from './SectionHeading';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,11 +8,8 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
-import { IoIosPhonePortrait } from 'react-icons/io';
-import { AiOutlineStar, AiOutlineGift } from 'react-icons/ai';
-import { GiPerfumeBottle } from 'react-icons/gi';
-import { MdOutlineFiberNew } from 'react-icons/md';
 import CategoryCard from './CategoryCard';
+import axios from 'axios';
 
 const Category = () => {
   const router = useRouter();
@@ -21,15 +18,34 @@ const Category = () => {
 
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
+  const [categoryData, setCategoryData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Available icon gulo diye category data setup kora holo
-  const categoryData = [
-    { name: "All Categories", slug: "all", icon: IoIosPhonePortrait },
-    { name: "Beauty & Makeup", slug: "beauty", icon: AiOutlineStar },
-    { name: "Fragrances", slug: "fragrances", icon: GiPerfumeBottle },
-    { name: "Fashion Accessories", slug: "furniture", icon: AiOutlineGift },
-    { name: "New Arrivals", slug: "groceries", icon: MdOutlineFiberNew }
-  ];
+  // ব্যাকএন্ড থেকে রিয়েল ক্যাটাগরি ফেচ করা
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/v1/categories/all');
+        if (res.data.success) {
+          // "All Categories" অপشنটি শুরুতে রেখে বাকিগুলো যুক্ত করা হলো
+          const formattedCategories = [
+            { name: "All Categories", slug: "all", icon: null },
+            ...res.data.data.map(cat => ({
+              name: cat.name,
+              slug: cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-'),
+              icon: `http://localhost:5000${cat.icon}` // ব্যাকএন্ডের ইমেজ পাথ
+            }))
+          ];
+          setCategoryData(formattedCategories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleCategoryClick = (slug) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -41,6 +57,8 @@ const Category = () => {
     params.set("page", "1");
     router.push(`/products?${params.toString()}`, { scroll: false });
   };
+
+  if (loading) return null; // অথবা লোডিং স্পিনার দিতে পারেন
 
   return (
     <section className="mb-4 sm:mb-8 md:mb-10 w-full overflow-hidden">
@@ -65,7 +83,7 @@ const Category = () => {
           </div>
 
           <div className="mt-2 sm:mt-6 md:mt-10 mb-2 sm:mb-6 md:mb-[51px]">
-            {prevEl && nextEl && (
+            {prevEl && nextEl && categoryData.length > 0 && (
               <Swiper
                 modules={[Navigation]}
                 spaceBetween={32}

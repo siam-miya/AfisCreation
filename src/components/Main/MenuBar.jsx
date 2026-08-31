@@ -16,50 +16,14 @@ import { useWishlistStore } from '@/store/useWishlistStore'
 import { FiUser, FiLogOut, FiHeart } from "react-icons/fi"
 import { toast } from 'react-toastify'
 import { Spinner } from '@heroui/react';
-import { BiLaptop } from "react-icons/bi";
 import { AiOutlineHome, AiOutlineAppstore, AiOutlineUser, AiOutlineInfoCircle } from "react-icons/ai"
-import {
-    FaCar, FaClock, FaHome, FaMobileAlt, FaMotorcycle,
-    FaRedhat, FaRunning, FaShoppingBag, FaTshirt
-} from "react-icons/fa";
-import { FaUserTie } from "react-icons/fa6";
-import {
-    GiBigDiamondRing, GiDelicatePerfume, GiFootprint,
-    Gi3dGlasses, GiLipstick, GiTable
-} from "react-icons/gi";
-import { MdChair, MdOutlineFastfood } from "react-icons/md";
+import { FaShoppingBag } from "react-icons/fa";
 import { TbTruckDelivery } from 'react-icons/tb';
-
-const categoryIcons = {
-    "beauty": <GiLipstick size={18} />,
-    "fragrances": <GiDelicatePerfume size={18} />,
-    "furniture": <MdChair size={18} />,
-    "groceries": <MdOutlineFastfood size={18} />,
-    "home-decoration": <FaHome size={18} />,
-    "kitchen-accessories": <GiTable size={18} />,
-    "laptops": <BiLaptop size={18} />,
-    "mens-shirts": <FaUserTie size={18} />,
-    "mens-shoes": <GiFootprint size={18} />,
-    "mens-watches": <FaClock size={18} />,
-    "mobile-accessories": <FaMobileAlt size={18} />,
-    "motorcycle": <FaMotorcycle size={18} />,
-    "skin-care": <GiLipstick size={18} />,
-    "smartphones": <FaMobileAlt size={18} />,
-    "sports-accessories": <FaRunning size={18} />,
-    "sunglasses": <Gi3dGlasses size={18} />,
-    "tops": <FaTshirt size={18} />,
-    "vehicle": <FaCar size={18} />,
-    "womens-bags": <FaShoppingBag size={18} />,
-    "womens-dresses": <FaRedhat size={18} />,
-    "womens-jewellery": <GiBigDiamondRing size={18} />,
-    "womens-shoes": <GiFootprint size={18} />,
-    "womens-watches": <FaClock size={18} />,
-};
+import axios from 'axios';
 
 const MenuBar = () => {
     const pathname = usePathname();
     const router = useRouter();
-    const isHomePage = pathname === '/';
     const cart = useCartStore((state) => state.cart);
     const wishlist = useWishlistStore((state) => state.wishlist);
     const { isDrawerOpen, closeDrawer, toggleDrawer } = useDrawerStore();
@@ -69,7 +33,6 @@ const MenuBar = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    // Dropdown state for click-based toggle on all pages
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     
     const dropdownRef = useRef(null);
@@ -80,11 +43,12 @@ const MenuBar = () => {
 
         const fetchCategories = async () => {
             try {
-                const res = await fetch('https://dummyjson.com/products/categories');
-                const data = await res.json();
-                setCategories(data.slice(0, 11));
+                const res = await axios.get('http://localhost:5000/api/v1/categories/all');
+                if (res.data.success) {
+                    setCategories(res.data.data);
+                }
             } catch (error) {
-                console.error("Failed to fetch categories:", error);
+                console.error("Failed to fetch categories from backend:", error);
             } finally {
                 setLoading(false);
             }
@@ -103,7 +67,6 @@ const MenuBar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // Close dropdown or drawer when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (drawerRef.current && !drawerRef.current.contains(event.target)) {
@@ -129,7 +92,6 @@ const MenuBar = () => {
         router.push('/login');
     };
 
-    // Check auth for Order Track
     const handleOrderTrackClick = (e) => {
         const user = localStorage.getItem('user');
         if (!user) {
@@ -146,7 +108,7 @@ const MenuBar = () => {
                     <div className={`flex items-center justify-between relative transition-all duration-300 ${isScrolled ? "py-2.5" : ""}`}>
                         <div className="w-[220px] lg:w-[270px] flex-shrink-0 flex items-center">
                             {!isScrolled ? (
-                                <div className="w-full z-20 relative self-start" ref={dropdownRef}>
+                                <div className="w-full z-50 relative self-start" ref={dropdownRef}>
                                     <h2 
                                         onClick={() => setIsDropdownOpen(prev => !prev)}
                                         className="bg-primary text-white py-3.5 px-4 flex items-center justify-between gap-2 font-bold text-sm select-none cursor-pointer rounded-t-md"
@@ -164,7 +126,8 @@ const MenuBar = () => {
                                         </span>
                                     </h2>
 
-                                    <ul className={`w-full bg-white border border-gray-200 shadow-lg p-2 flex flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] max-h-[450px] overflow-y-auto scrollbar-none ${isDropdownOpen ? 'flex' : 'hidden'}`}>
+                                    {/* ক্যাটাগরি মেইন ড্রপডাউন বক্স - overflow কাটার সমস্যা দূর করা হয়েছে */}
+                                    <ul className={`w-full bg-white border border-gray-200 shadow-xl p-2 flex flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] overflow-visible ${isDropdownOpen ? 'flex' : 'hidden'}`}>
                                         {loading ? (
                                             <div className="flex flex-col items-center py-5 gap-2">
                                                 <Spinner size="md" color="danger" />
@@ -172,12 +135,9 @@ const MenuBar = () => {
                                             </div>
                                         ) : (
                                             categories.map((cat, index) => (
-                                                <ListItems
-                                                    key={index}
-                                                    text={cat.name}
-                                                    slug={cat.slug}
-                                                    categoryIcon={categoryIcons[cat.slug] || <FaShoppingBag size={18} />}
-                                                    rightIcon={true}
+                                                <CategoryListItem
+                                                    key={cat._id || index}
+                                                    category={cat}
                                                     onClick={() => {
                                                         if (pathname !== '/') setIsDropdownOpen(false);
                                                     }}
@@ -241,123 +201,65 @@ const MenuBar = () => {
                     </div>
                 </div>
             </section>
-
-            <div className={`fixed inset-0 bg-black/60 z-[99999] transition-opacity duration-300 lg:hidden ${isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-                <div ref={drawerRef} className={`fixed top-0 left-0 bottom-0 w-[290px] bg-[#F7F7F7] z-[999999] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"}`}>
-
-                    <div className="p-4 bg-white relative">
-                        <button onClick={closeDrawer} className="absolute right-4 top-4 text-gray-500 hover:text-black p-1 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-                            <RxCross2 size={20} />
-                        </button>
-
-                        <div className="mt-6 bg-primary rounded-2xl p-4 text-white flex items-center gap-4 shadow-md">
-                            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white border border-white/30">
-                                <RiUser3Line size={26} />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-base font-poppins">Hello there!</h3>
-                                <Link href="/signup" onClick={closeDrawer} className="text-xs text-white/90 underline hover:text-white">Signin</Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto px-4 py-2">
-                        <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-100">
-                            <ul className="flex flex-col divide-y divide-gray-50">
-                                {loading ? (
-                                    <div className="flex flex-col items-center py-10 gap-2">
-                                        <Spinner size="md" color="danger" />
-                                        <span className="text-sm text-primary">Categories Loading...</span>
-                                    </div>
-                                ) : (
-                                    categories.map((cat, index) => (
-                                        <ListItems
-                                            key={index}
-                                            text={cat.name}
-                                            slug={cat.slug}
-                                            categoryIcon={categoryIcons[cat.slug] || <FaShoppingBag size={18} />}
-                                            rightIcon={true}
-                                            onClick={closeDrawer}
-                                        />
-                                    ))
-                                )}
-                            </ul>
-                        </div>
-                        <div className="mt-5 mb-4">
-                            <h4 className="text-xs font-bold text-gray-400 px-2 mb-2 tracking-wider">QUICK LINKS</h4>
-                            <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-100 flex flex-col gap-1">
-                                <Link href="/about" onClick={closeDrawer} className="flex items-center gap-3 py-2.5 px-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-poppins">
-                                    <AiOutlineInfoCircle size={18} className="text-gray-500" />
-                                    <span>About Us</span>
-                                </Link>
-                                <Link href="/wishlist" onClick={closeDrawer} className="flex items-center gap-3 py-2.5 px-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-poppins">
-                                    <FiHeart size={18} className="text-gray-500" />
-                                    <span>Wishlists</span>
-                                </Link>
-                                <Link href="/faq" onClick={closeDrawer} className="flex items-center gap-3 py-2.5 px-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors font-poppins">
-                                    <MdHelpOutline size={18} className="text-gray-500" />
-                                    <span>Faqs</span>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 h-14 bg-primary text-white grid grid-cols-5 items-center justify-items-center z-[9999] shadow-[0_-2px_10px_rgba(0,0,0,0.1)] font-poppins px-1">
-                <Link href="/" className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] ${pathname === '/' ? "text-black font-semibold" : ""}`}>
-                    <AiOutlineHome size={22} />
-                    <span>HOME</span>
-                </Link>
-
-                <Link href="/wishlist" className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] relative ${pathname === '/wishlist' ? "text-black font-semibold" : ""}`}>
-                    <div className="relative flex items-center justify-center">
-                        <FiHeart size={22} className={pathname === '/wishlist' ? "text-black" : "text-white"} />
-                        <span className="absolute -top-1.5 -right-2 bg-white text-primary font-bold rounded-full text-[9px] w-4.5 h-4.5 flex items-center justify-center">
-                            {wishlistCount}
-                        </span>
-                    </div>
-                    <span>WISHLIST</span>
-                </Link>
-
-                <button onClick={toggleDrawer} className="flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px]">
-                    <AiOutlineAppstore size={22} />
-                    <span>CATEGORIES</span>
-                </button>
-
-                <Link 
-                    href="/order/ordertrack" 
-                    onClick={handleOrderTrackClick}
-                    className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] relative ${pathname === '/ordertrack' ? "text-black font-semibold" : ""}`}
-                >
-                    <div className="relative flex items-center justify-center">
-                        <TbTruckDelivery size={22} className={pathname === '/ordertrack' ? "text-black" : "text-white"} />
-                    </div>
-                    <span className="whitespace-nowrap">ORDER TRACK</span>
-                </Link>
-
-                <Link href="/user/profile" className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] ${pathname.startsWith('/user') ? "text-black font-semibold" : ""}`}>
-                    <AiOutlineUser size={22} />
-                    <span>ACCOUNT</span>
-                </Link>
-            </div>
         </>
     )
 }
 
 export default MenuBar
 
-function ListItems({ rightIcon = false, categoryIcon, text, slug, onClick }) {
+// সাব-ক্যাটাগরি আইটেম কম্পোনেন্ট যেখানে পজিশন বাইরে নিয়ে আসার ব্যবস্থা করা হয়েছে
+function CategoryListItem({ category, onClick }) {
+    const [imgError, setImgError] = useState(false);
+    const hasSubcategories = category.subcategories && category.subcategories.length > 0;
+    const categoryIcon = category.icon ? `http://localhost:5000${category.icon}` : null;
+    const slug = category.slug || category.name.toLowerCase().replace(/\s+/g, '-');
+
     return (
-        <li className="w-full text-black hover:bg-gray-50 rounded-xl transition-all" onClick={onClick}>
+        <li className="w-full text-black hover:bg-gray-50 rounded-xl transition-all relative group/item">
             <Link
                 href={`/products?category=${slug}`}
+                onClick={onClick}
                 className='grid grid-cols-[24px_1fr_24px] gap-2 items-center py-2.5 px-3'
             >
-                <span className="flex items-center justify-center text-gray-500">{categoryIcon}</span>
-                <span className='text-xs sm:text-sm capitalize font-poppins font-medium text-gray-700'>{text}</span>
-                {rightIcon && <MdOutlineKeyboardArrowRight size={18} className="text-gray-400" />}
+                <span className="flex items-center justify-center text-gray-500">
+                    {categoryIcon && !imgError ? (
+                        <img 
+                            src={categoryIcon} 
+                            alt={category.name} 
+                            className="w-5 h-5 object-cover rounded-sm" 
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <FaShoppingBag size={16} className="text-gray-400" />
+                    )}
+                </span>
+                <span className='text-xs sm:text-sm capitalize font-poppins font-medium text-gray-700'>{category.name}</span>
+                
+                {hasSubcategories ? (
+                    <MdOutlineKeyboardArrowRight size={18} className="text-gray-400 justify-self-end" />
+                ) : (
+                    <span></span>
+                )}
             </Link>
+
+            {/* সাব-ক্যাটাগরি পপআপ যা মেইন ড্রপডাউনের ডানপাশে পুরোপুরি বাইরে ভেসে থাকবে */}
+            {hasSubcategories && (
+                <div className="absolute left-full top-0 ml-1 w-56 bg-white border border-gray-200 shadow-2xl rounded-md p-2 opacity-0 invisible group-hover/item:opacity-100 group-hover/item:visible transition-all duration-200 z-[99999] flex flex-col gap-1">
+                    {category.subcategories.map((sub) => {
+                        const subSlug = sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-');
+                        return (
+                            <Link
+                                key={sub._id || sub.name}
+                                href={`/products?category=${subSlug}`}
+                                onClick={onClick}
+                                className="py-2 px-3 text-xs sm:text-sm text-gray-700 hover:bg-primary hover:text-white rounded-md transition-colors font-poppins"
+                            >
+                                {sub.name}
+                            </Link>
+                        );
+                    })}
+                </div>
+            )}
         </li>
-    )
+    );
 }
