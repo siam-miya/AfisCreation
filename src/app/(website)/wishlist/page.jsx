@@ -32,7 +32,7 @@ const WishList = () => {
 
   return (
     <div className="container py-8 font-poppins px-4 md:px-0">
-      <div className="flex justify-between  items-center mb-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-xl md:text-2xl font-bold text-black">
           Wishlist ({wishlist.length})
         </h1>
@@ -54,7 +54,7 @@ const WishList = () => {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 justify-items-center">
           {wishlist.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product._id || product.id} product={product} />
           ))}
         </div>
       )}

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import SectionHeading from './SectionHeading';
@@ -12,16 +12,42 @@ import Button from './Button';
 import Link from 'next/link';
 
 const FlashSales = () => {
-  const [products, setProducts] = useState([]);
+  const [flashProducts, setFlashProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const res = await fetch("https://dummyjson.com/products");
-      const data = await res.json();
-      setProducts(data.products);
+    const fetchFlashSales = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; 
+        
+        const res = await fetch(`${apiUrl}/api/products`);
+        const result = await res.json();
+        
+        let productsArray = [];
+        if (result.success && result.data) {
+           productsArray = result.data;
+        } else if (Array.isArray(result)) {
+           productsArray = result;
+        }
+
+        // শুধু যেগুলোর isFlashSale true সেগুলো ফিল্টার করা
+        const filtered = productsArray.filter(product => product.isFlashSale === true);
+        setFlashProducts(filtered);
+        
+      } catch (error) {
+        console.error("Failed to fetch flash sales:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchProducts();
+
+    fetchFlashSales();
   }, []);
+
+  // যদি লোডিং হয় অথবা ডাটাবেজে কোনো ফ্ল্যাশ সেল প্রোডাক্ট না থাকে, তবে সেকশনটি দেখাবে না
+  if (loading || flashProducts.length === 0) {
+    return null; 
+  }
 
   return (
     <section className="w-full">
@@ -56,8 +82,8 @@ const FlashSales = () => {
               }}
               className="!overflow-hidden"
             >
-              {products.slice(0, 8).map((product) => (
-                <SwiperSlide key={product.id}>
+              {flashProducts.map((product) => (
+                <SwiperSlide key={product._id || product.id}>
                   <ProductCard product={product} />
                 </SwiperSlide>
               ))}

@@ -1,5 +1,6 @@
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminTopbar from "@/components/admin/AdminTopbar";
+import AdminSidebar from "@/components/Admin/AdminSidebar";
+import AdminTopbar from "@/components/Admin/AdminTopbar";
+
 
 export default function SecretAdminLayout({ children }) {
   return (

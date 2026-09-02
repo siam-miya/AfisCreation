@@ -18,11 +18,24 @@ const ProductsPage = async ({ searchParams }) => {
   const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
   const minPrice = parseInt(resolvedSearchParams.minPrice || "0", 10);
   const maxPrice = parseInt(resolvedSearchParams.maxPrice || "999999", 10);
-
   const view = resolvedSearchParams.view || "4";
-  const res = await fetch("https://dummyjson.com/products?limit=100");
-  const data = await res.json();
-  let productsData = data.products;
+
+  // তোর লোকাল ব্যাকএন্ড থেকে ডেটা ফেচ করার ব্যবস্থা
+  let productsData = [];
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const res = await fetch(`${apiUrl}/api/products`, { cache: 'no-store' });
+    const result = await res.json();
+    
+    // ব্যাকএন্ডের রেসপন্স স্ট্রাকচার অনুযায়ী ডেটা অ্যারে নিশ্চিত করা
+    productsData = result.data || result; 
+    if (!Array.isArray(productsData)) {
+      productsData = [];
+    }
+  } catch (error) {
+    console.error("Error fetching products from backend:", error);
+    productsData = [];
+  }
 
   let filteredProducts = selectedCategory === "all"
     ? productsData
@@ -35,7 +48,7 @@ const ProductsPage = async ({ searchParams }) => {
   if (selectedColor !== "all") {
     filteredProducts = filteredProducts.filter((product) => 
       product.title.toLowerCase().includes(selectedColor) || 
-      product.description.toLowerCase().includes(selectedColor)
+      (product.description && product.description.toLowerCase().includes(selectedColor))
     );
   }
 
@@ -44,9 +57,9 @@ const ProductsPage = async ({ searchParams }) => {
   } else if (sortBy === "high-low") {
     filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
   } else if (sortBy === "popularity") {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.rating - a.rating);
+    filteredProducts = [...filteredProducts].sort((a, b) => (b.rating || 0) - (a.rating || 0));
   } else if (sortBy === "latest") {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.id - a.id);
+    filteredProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }
 
   const totalResults = filteredProducts.length;
@@ -82,7 +95,7 @@ const ProductsPage = async ({ searchParams }) => {
               >
                 {displayedProducts.length > 0 ? (
                   displayedProducts.map((product) => (
-                    <div key={product.id} className="w-full flex">
+                    <div key={product._id || product.id} className="w-full flex">
                       <ProductCard product={product} />
                     </div>
                   ))

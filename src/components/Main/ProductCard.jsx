@@ -11,7 +11,8 @@ export default function ProductCard({ product }) {
   return (
     <div className="group w-full xs:max-w-[310px] mx-auto rounded-xl overflow-hidden font-poppins bg-[#FAFAFA] hover:shadow-2xl sm:hover:-translate-y-2 transition-all duration-300 border border-gray-100 hover:border-gray-200 will-change-transform flex flex-col justify-between h-full">
 
-      <Link href={`/products/${product.id}`} className="block flex-1">
+      {/* এখানে product.id এর পরিবর্তে product._id দেওয়া হয়েছে যাতে undefined না আসে */}
+      <Link href={`/products/${product._id || product.id}`} className="block flex-1">
         {/* Image Container */}
         <div className="relative w-full h-[260px] xs:h-[300px] sm:h-[340px] md:h-[380px] flex items-center justify-center overflow-hidden bg-white p-2">
 

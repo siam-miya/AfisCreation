@@ -6,21 +6,41 @@ import ProductCard from './ProductCard';
 import Link from 'next/link';
 
 const BestSelling = () => {
-  const [products, setProducts] = useState([]);
+  const [bestProducts, setBestProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchBestSelling = async () => {
       try {
-        const res = await fetch("https://dummyjson.com/products");
-        const data = await res.json();
-        setProducts(data.products);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const res = await fetch(`${apiUrl}/api/products`);
+        const result = await res.json();
+        
+        let productsArray = [];
+        if (result.success && result.data) {
+           productsArray = result.data;
+        } else if (Array.isArray(result)) {
+           productsArray = result;
+        }
+
+        // শুধু যেগুলোর isBestSelling true সেগুলো ফিল্টার করা
+        const filtered = productsArray.filter(product => product.isBestSelling === true);
+        setBestProducts(filtered);
+
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch best selling products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchBestSelling();
   }, []);
+
+  // যদি লোডিং হয় অথবা কোনো বেস্ট সেলিং প্রোডাক্ট না থাকে, তবে সেকশনটি দেখাবে না
+  if (loading || bestProducts.length === 0) {
+    return null;
+  }
 
   return (
     <section className="w-full py-8 md:py-12">
@@ -33,17 +53,17 @@ const BestSelling = () => {
             <Button TagName={Link} href={"/products"}>View All</Button>
           </div>
         </div>
+        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-6 md:mt-10 mb-10">
-          {products.slice(7, 11).map((product) => (
-            <div key={product.id} className="w-full">
+          {bestProducts.map((product) => (
+            <div key={product._id || product.id} className="w-full">
               <ProductCard product={product} />
             </div>
           ))}
         </div>
-
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default BestSelling;

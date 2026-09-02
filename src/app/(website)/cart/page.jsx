@@ -18,8 +18,10 @@ const CartPage = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   if (!isMounted) return <div className="text-center py-10 font-sans">Loading cart...</div>;
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const subtotal = cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
   const shippingCharge = shippingMethod === 'inside' ? 70 : 130;
   const totalCost = subtotal + shippingCharge;
 
@@ -39,6 +41,7 @@ const CartPage = () => {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
+            {/* Desktop Table View */}
             <div className="hidden md:block bg-white rounded-md border shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[700px]">
@@ -52,105 +55,115 @@ const CartPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {cart.map((item) => (
-                      <tr key={item.id} className="border-b group hover:bg-gray-50/30 transition-colors">
-                        <td className="py-5 px-4 flex items-center space-x-4 relative">
-                          <div className="relative shrink-0">
-                            <button
-                              onClick={() => removeFromCart(item.id)}
-                              className="absolute -top-2 -left-2 bg-[#DB4444] text-white rounded-full p-0.5 z-10 cursor-pointer shadow hover:scale-105 transition-transform"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                            <div className="w-14 h-14 bg-white border rounded-md p-1 flex items-center justify-center">
-                              <Image src={item.thumbnail} alt={item.title} width={50} height={50} className="object-contain rounded-sm" />
+                    {cart.map((item) => {
+                      const itemId = item._id || item.id;
+                      return (
+                        <tr key={itemId} className="border-b group hover:bg-gray-50/30 transition-colors">
+                          <td className="py-5 px-4 flex items-center space-x-4 relative">
+                            <div className="relative shrink-0">
+                              <button
+                                onClick={() => removeFromCart(itemId)}
+                                className="absolute -top-2 -left-2 bg-[#DB4444] text-white rounded-full p-0.5 z-10 cursor-pointer shadow hover:scale-105 transition-transform"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              <div className="w-14 h-14 bg-white border rounded-md p-1 flex items-center justify-center">
+                                <Image src={item.thumbnail} alt={item.title} width={50} height={50} className="object-contain rounded-sm" />
+                              </div>
                             </div>
-                          </div>
-                          <span className="font-medium text-gray-800 truncate max-w-[180px] lg:max-w-[240px]">{item.title}</span>
-                        </td>
-                        <td className="py-5 px-4 text-gray-700">৳{item.price.toFixed(2)}</td>
-                        <td className="py-5 px-4">
-                          <div className="flex items-center border border-gray-400 rounded-md overflow-hidden w-fit h-10 select-none bg-white">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="px-4 h-full bg-white text-gray-700 hover:bg-gray-100 transition-colors font-medium border-r border-gray-400 flex items-center justify-center cursor-pointer text-lg"
-                            >
-                              −
-                            </button>
-                            <div className="w-12 text-center font-bold text-black text-base flex items-center justify-center h-full bg-white">
-                              {String(item.quantity).padStart(2, '0')}
+                            <span className="font-medium text-gray-800 truncate max-w-[180px] lg:max-w-[240px]">{item.title}</span>
+                          </td>
+                          <td className="py-5 px-4 text-gray-700">৳{Number(item.price).toFixed(2)}</td>
+                          <td className="py-5 px-4">
+                            <div className="flex items-center border border-gray-400 rounded-md overflow-hidden w-fit h-10 select-none bg-white">
+                              <button
+                                onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                                className="px-4 h-full bg-white text-gray-700 hover:bg-gray-100 transition-colors font-medium border-r border-gray-400 flex items-center justify-center cursor-pointer text-lg"
+                              >
+                                −
+                              </button>
+                              <div className="w-12 text-center font-bold text-black text-base flex items-center justify-center h-full bg-white">
+                                {String(item.quantity).padStart(2, '0')}
+                              </div>
+                              <button
+                                onClick={() => updateQuantity(itemId, item.quantity + 1)}
+                                className="px-4 h-full bg-primary text-white hover:bg-secondary transition-colors font-medium flex items-center justify-center cursor-pointer text-lg"
+                              >
+                                +
+                              </button>
                             </div>
+                          </td>
+                          <td className="py-5 px-4 font-medium text-gray-900">
+                            ৳{(Number(item.price) * item.quantity).toFixed(2)}
+                          </td>
+                          <td className="py-5 px-4 text-center">
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="px-4 h-full bg-primary text-white hover:bg-secondary transition-colors font-medium flex items-center justify-center cursor-pointer text-lg"
+                              onClick={() => removeFromCart(itemId)}
+                              className="text-gray-400 hover:text-[#DB4444] transition-colors p-2 cursor-pointer inline-flex items-center justify-center"
+                              title="Remove Item"
                             >
-                              +
+                              <FiTrash2 className="w-5 h-5" />
                             </button>
-                          </div>
-                        </td>
-                        <td className="py-5 px-4 font-medium text-gray-900">
-                          ৳{(item.price * item.quantity).toFixed(2)}
-                        </td>
-                        <td className="py-5 px-4 text-center">
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-gray-400 hover:text-[#DB4444] transition-colors p-2 cursor-pointer inline-flex items-center justify-center"
-                            title="Remove Item"
-                          >
-                            <FiTrash2 className="w-5 h-5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
+
+            {/* Mobile Card View */}
             <div className="block md:hidden space-y-4">
-              {cart.map((item) => (
-                <div key={item.id} className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex gap-4 relative">
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="absolute top-3 right-3 text-gray-400 hover:text-[#DB4444] p-1 cursor-pointer"
-                  >
-                    <FiTrash2 className="w-5 h-5" />
-                  </button>
-                  <div className="w-20 h-20 bg-gray-50 border border-gray-200 rounded-md p-1 flex items-center justify-center shrink-0">
-                    <Image src={item.thumbnail} alt={item.title} width={70} height={70} className="object-contain rounded-sm" />
-                  </div>
-
-                  <div className="flex flex-col justify-between flex-1 pr-6">
-                    <div>
-                      <h3 className="font-semibold text-gray-800 text-sm line-clamp-1">{item.title}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">Price: ৳{item.price.toFixed(2)}</p>
+              {cart.map((item) => {
+                const itemId = item._id || item.id;
+                return (
+                  <div key={itemId} className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex gap-4 relative">
+                    <button
+                      onClick={() => removeFromCart(itemId)}
+                      className="absolute top-3 right-3 text-gray-400 hover:text-[#DB4444] p-1 cursor-pointer"
+                    >
+                      <FiTrash2 className="w-5 h-5" />
+                    </button>
+                    <div className="w-20 h-20 bg-gray-50 border border-gray-200 rounded-md p-1 flex items-center justify-center shrink-0">
+                      <Image src={item.thumbnail} alt={item.title} width={70} height={70} className="object-contain rounded-sm" />
                     </div>
 
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center border border-gray-400 rounded-md overflow-hidden h-8 select-none bg-white">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="px-2.5 h-full text-gray-600 hover:bg-gray-100 border-r border-gray-400 flex items-center justify-center cursor-pointer text-sm"
-                        >
-                          −
-                        </button>
-                        <div className="w-8 text-center font-medium text-gray-800 text-xs flex items-center justify-center h-full">
-                          {String(item.quantity).padStart(2, '0')}
-                        </div>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="px-2.5 h-full bg-primary text-white hover:bg-orange-600 flex items-center justify-center cursor-pointer text-sm"
-                        >
-                          +
-                        </button>
+                    <div className="flex flex-col justify-between flex-1 pr-6">
+                      <div>
+                        <h3 className="font-semibold text-gray-800 text-sm line-clamp-1">{item.title}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">Price: ৳{Number(item.price).toFixed(2)}</p>
                       </div>
-                      <span className="font-bold text-gray-900 text-sm">
-                        ৳{(item.price * item.quantity).toFixed(2)}
-                      </span>
+
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center border border-gray-400 rounded-md overflow-hidden h-8 select-none bg-white">
+                          <button
+                            onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                            className="px-2.5 h-full text-gray-600 hover:bg-gray-100 border-r border-gray-400 flex items-center justify-center cursor-pointer text-sm"
+                          >
+                            −
+                          </button>
+                          <div className="w-8 text-center font-medium text-gray-800 text-xs flex items-center justify-center h-full">
+                            {String(item.quantity).padStart(2, '0')}
+                          </div>
+                          <button
+                            onClick={() => updateQuantity(itemId, item.quantity + 1)}
+                            className="px-2.5 h-full bg-primary text-white hover:bg-orange-600 flex items-center justify-center cursor-pointer text-sm"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="font-bold text-gray-900 text-sm">
+                          ৳{(Number(item.price) * item.quantity).toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+
+            {/* Cart Totals & Actions */}
             <div className="flex flex-col lg:flex-row gap-6 justify-between items-start mt-2">
               <div className="w-full lg:w-auto order-2 lg:order-1">
                 <Button TagName={Link} href={"/products"} className="w-full sm:w-auto text-center justify-center">

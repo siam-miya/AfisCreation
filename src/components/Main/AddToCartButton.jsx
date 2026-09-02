@@ -11,13 +11,17 @@ const AddToCartButton = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    const isAlreadyInCart = cart.some((item) => item.id === product.id);
+
+    const productId = product._id || product.id;
+    const isAlreadyInCart = cart.some((item) => (item._id || item.id) === productId);
 
     if (isAlreadyInCart) {
       toast.info(`"${product.title}" is already in cart!`, { position: "top-center", autoClose: 2000 });
       return;
     }
-    addToCart(product);
+
+    // সঠিক আইডি সহ প্রোডাক্ট অবজেক্ট পাস করা হচ্ছে
+    addToCart({ ...product, id: productId });
     toast.success(`${product.title} added!`, { position: "top-center", autoClose: 1500 });
   };
 

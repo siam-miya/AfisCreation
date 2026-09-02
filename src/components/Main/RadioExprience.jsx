@@ -1,13 +1,42 @@
-import Image from "next/image"
-import CountdownTwo from "./CountDownTwo"
-import Link from "next/link"
+"use client";
+import React, { useState, useEffect } from 'react';
+import Image from "next/image";
+import CountdownTwo from "./CountDownTwo";
+import Link from "next/link";
 
-const RadioExprience = async () => {
-    const res = await fetch("https://dummyjson.com/products")
-    const data = await res.json()
-    const productData = data.products
-    const featuredProduct = productData?.[13];
-    if (!featuredProduct) return null;
+const RadioExprience = () => {
+    const [featuredProduct, setFeaturedProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchHotBanner = async () => {
+            try {
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+                const res = await fetch(`${apiUrl}/api/products`);
+                const result = await res.json();
+                
+                let productsArray = [];
+                if (result.success && result.data) {
+                    productsArray = result.data;
+                } else if (Array.isArray(result)) {
+                    productsArray = result;
+                }
+
+                const found = productsArray.find(product => product.isHotProductBanner === true);
+                setFeaturedProduct(found || null);
+            } catch (error) {
+                console.error("Failed to fetch hot product banner:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHotBanner();
+    }, []);
+
+    if (loading || !featuredProduct) {
+        return null;
+    }
 
     return (
         <section className="w-full px-4 md:px-0 mb-12">
@@ -25,7 +54,7 @@ const RadioExprience = async () => {
                         </div>
 
                         <div className="pt-6 md:pt-8 w-full md:w-auto">
-                            <Link href={`/products/${featuredProduct.id}`} className="block w-full md:w-auto">
+                            <Link href={`/products/${featuredProduct._id || featuredProduct.id}`} className="block w-full md:w-auto">
                                 <button className="w-full md:w-auto bg-secondary text-white hover:bg-primary font-semibold py-3.5 px-10 md:py-4 md:px-12 rounded-[4px] cursor-pointer transition-all duration-300 transform active:scale-95 shadow-lg shadow-[#00ff66]/20">
                                     Buy Now!
                                 </button>
@@ -44,11 +73,10 @@ const RadioExprience = async () => {
                             />
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
-    )
-}
+    );
+};
 
-export default RadioExprience
+export default RadioExprience;

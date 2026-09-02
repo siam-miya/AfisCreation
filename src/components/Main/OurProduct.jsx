@@ -1,3 +1,5 @@
+"use client";
+import React, { useState, useEffect } from 'react';
 import SectionHeading from './SectionHeading';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -5,10 +7,38 @@ import ProductCard from './ProductCard';
 import Button from './Button';
 import Link from 'next/link';
 
-const OurProducts = async () => {
-  const res = await fetch("https://dummyjson.com/products")
-  const data = await res.json()
-  const productsData = data.products
+const OurProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOurProducts = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const res = await fetch(`${apiUrl}/api/products`);
+        const result = await res.json();
+        
+        let productsArray = [];
+        if (result.success && result.data) {
+           productsArray = result.data;
+        } else if (Array.isArray(result)) {
+           productsArray = result;
+        }
+
+        setProducts(productsArray);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOurProducts();
+  }, []);
+
+  if (loading) {
+    return null; // অথবা লোডিং স্পিনার দেখাতে পারো
+  }
 
   return (
     <section className="max-w-full">
@@ -18,8 +48,8 @@ const OurProducts = async () => {
             <SectionHeading subHeading={"Our Products"} heading={"Explore Our Products"} countDown={false} />
           </div>
           <div className='mt-6 md:mt-10 mb-8 md:mb-13 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8'>
-            {productsData.slice(8, 16).map((product) => (
-              <div key={product.id} className="w-full">
+            {products.slice(0, 8).map((product) => (
+              <div key={product._id || product.id} className="w-full">
                 <ProductCard product={product} />
               </div>
             ))}
