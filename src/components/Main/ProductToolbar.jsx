@@ -7,16 +7,21 @@ import { TfiLayoutGrid4Alt } from "react-icons/tfi";
 
 const MIN_PRICE_LIMIT = 0;
 const MAX_PRICE_LIMIT = 50000;
-const STEP = 10; 
+const STEP = 100; 
 
 const ProductToolbar = ({ totalProducts, currentShowing }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [priceValues, setPriceValues] = useState([
-    parseInt(searchParams.get("minPrice") || MIN_PRICE_LIMIT, 10),
-    parseInt(searchParams.get("maxPrice") || MAX_PRICE_LIMIT, 10),
-  ]);
+  
+  const currentMinPrice = parseInt(searchParams.get("minPrice") || MIN_PRICE_LIMIT, 10);
+  const currentMaxPrice = parseInt(searchParams.get("maxPrice") || MAX_PRICE_LIMIT, 10);
+
+  const [priceValues, setPriceValues] = useState([currentMinPrice, currentMaxPrice]);
+
+  useEffect(() => {
+    setPriceValues([currentMinPrice, currentMaxPrice]);
+  }, [currentMinPrice, currentMaxPrice]);
   
   const currentView = searchParams.get("view") || "4";
   const popupRef = useRef(null);
@@ -34,6 +39,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
   const handleParamChange = (key, value) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
+    params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
@@ -41,6 +47,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("minPrice", priceValues[0].toString());
     params.set("maxPrice", priceValues[1].toString());
+    params.set("page", "1");
     router.push(`?${params.toString()}`, { scroll: false });
     setIsFilterOpen(false); 
   };
@@ -93,7 +100,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
                           style={{
                             background: getTrackBackground({
                               values: priceValues,
-                              colors: ["#fff", "#a77d48", "#fff"],
+                              colors: ["#ccc", "#8a5830", "#ccc"],
                               min: MIN_PRICE_LIMIT,
                               max: MAX_PRICE_LIMIT,
                             }),
@@ -110,7 +117,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
                       <div
                         key={key}
                         {...restProps}
-                        className="h-4 w-1.5 bg-primary rounded focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                        className="h-4 w-4 bg-[#8a5830] rounded-full focus:outline-none cursor-pointer border-2 border-white shadow"
                         style={{ ...restProps.style }}
                       />
                     );
@@ -128,7 +135,7 @@ const ProductToolbar = ({ totalProducts, currentShowing }) => {
               <div className="flex items-center justify-start mt-5 pt-4 border-t border-gray-50">
                 <button 
                   onClick={handlePriceFilterSubmit}
-                  className="bg-primary text-white hover:bg-black font-semibold px-5 py-2 rounded-lg text-sm transition-all shadow-sm font-poppins cursor-pointer"
+                  className="bg-[#8a5830] text-white hover:bg-black font-semibold px-5 py-2 rounded-lg text-sm transition-all shadow-sm font-poppins cursor-pointer"
                 >
                   Filter
                 </button>

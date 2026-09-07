@@ -6,34 +6,59 @@ import { TfiEmail } from 'react-icons/tfi';
 import { toast } from 'react-toastify';
 import Button from './Button';
 
-const ContactFormSection = () => {
+const ContactFormSection = ({ contactInfo }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     message: '',
   });
+  const [loading, setLoading] = useState(false);
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.phone || !formData.message) {
       toast.error('Please fill in all required (*) fields.');
       return;
     }
 
-    toast.success('Message sent successfully!');
-    console.log('Contact Form Submitted:', formData);
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    try {
+      setLoading(true);
+      const res = await fetch(`${BASE_URL}/api/contact/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success(data.message || 'Message sent successfully!');
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      } else {
+        toast.error(data.message || 'Failed to send message.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <section className="container mx-auto px-4 py-10 font-sans text-black">
       <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-stretch">
+        
+        {/* Contact Info (Backend Dynamic) */}
         <div className="bg-white p-8 rounded shadow-[0_1px_13px_rgba(0,0,0,0.05)] flex flex-col justify-between space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -43,12 +68,15 @@ const ContactFormSection = () => {
               <h3 className="font-medium text-base">Call To Us</h3>
             </div>
             <div className="space-y-2 text-sm text-gray-800">
-              <p>We are available 24/7, 7 days a week.</p>
-              <p className="font-medium">Phone: 01804673487</p>
+              <p>{contactInfo?.availability || 'We are available 24/7, 7 days a week.'}</p>
+              <p className="font-medium">
+                Phone: {contactInfo?.phone || '01804673487'}
+              </p>
             </div>
           </div>
 
           <hr className="border-gray-300" />
+
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white text-xl">
@@ -57,13 +85,14 @@ const ContactFormSection = () => {
               <h3 className="font-medium text-base">Write To Us</h3>
             </div>
             <div className="space-y-2 text-sm text-gray-800">
-              <p>Fill out our form and we will contact you within 24 hours.</p>
-              <p>Emails: customer@afiscreation.com</p>
-              <p>Emails: support@afiscreation.com</p>
+              <p>{contactInfo?.writeUsSubtext || 'Fill out our form and we will contact you within 24 hours.'}</p>
+              {contactInfo?.email1 && <p>Emails: {contactInfo.email1}</p>}
+              {contactInfo?.email2 && <p>Emails: {contactInfo.email2}</p>}
             </div>
           </div>
         </div>
 
+        {/* Contact Form Submission */}
         <form onSubmit={handleSendMessage} className="bg-white p-8 rounded shadow-[0_1px_13px_rgba(0,0,0,0.05)] flex flex-col justify-between space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
@@ -106,7 +135,9 @@ const ContactFormSection = () => {
             ></textarea>
           </div>
           <div className="flex justify-end pt-2">
-            <Button TagName={"button"} type='submit'>Send Message</Button>
+            <Button TagName={"button"} type="submit" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Message'}
+            </Button>
           </div>
         </form>
 

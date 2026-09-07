@@ -2,7 +2,22 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderTree, Package, ShoppingCart, Users, ChevronDown, ChevronUp, Zap, Sparkles, Flame, Star, Layers } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  FolderTree, 
+  Package, 
+  ShoppingCart, 
+  Users, 
+  ChevronDown, 
+  ChevronUp, 
+  Zap, 
+  Sparkles, 
+  Flame, 
+  Star, 
+  Layers,
+  Info,
+  Mail 
+} from 'lucide-react';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -110,6 +125,32 @@ export default function AdminSidebar() {
         >
           <Users size={20} />
           <span>Users</span>
+        </Link>
+
+        {/* About Page Menu Item */}
+        <Link
+          href="/secret-admin-portal-afia/dashboard/about"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            pathname.startsWith('/secret-admin-portal-afia/dashboard/about')
+              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+              : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Info size={20} />
+          <span>About Page</span>
+        </Link>
+
+        {/* Contact Page Menu Item */}
+        <Link
+          href="/secret-admin-portal-afia/dashboard/contact"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            pathname.startsWith('/secret-admin-portal-afia/dashboard/contact')
+              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+              : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Mail size={20} />
+          <span>Contact Page</span>
         </Link>
       </nav>
     </aside>

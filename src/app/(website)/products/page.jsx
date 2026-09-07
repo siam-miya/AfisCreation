@@ -16,19 +16,26 @@ const ProductsPage = async ({ searchParams }) => {
   const sortBy = resolvedSearchParams.sort || "default";
   const limit = parseInt(resolvedSearchParams.limit || "16", 10);
   const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
-  const minPrice = parseInt(resolvedSearchParams.minPrice || "0", 10);
-  const maxPrice = parseInt(resolvedSearchParams.maxPrice || "999999", 10);
+  const minPrice = resolvedSearchParams.minPrice || "";
+  const maxPrice = resolvedSearchParams.maxPrice || "";
   const view = resolvedSearchParams.view || "4";
 
-  // তোর লোকাল ব্যাকএন্ড থেকে ডেটা ফেচ করার ব্যবস্থা
   let productsData = [];
+
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const res = await fetch(`${apiUrl}/api/products`, { cache: 'no-store' });
+    
+    // 🟢 ব্যাকএন্ডে সরাসরি প্যারামিটার পাঠানোর জন্য URL Query গঠন
+    const queryParams = new URLSearchParams();
+    if (selectedCategory !== "all") queryParams.append("category", selectedCategory);
+    if (selectedColor !== "all") queryParams.append("color", selectedColor);
+    if (minPrice) queryParams.append("minPrice", minPrice);
+    if (maxPrice) queryParams.append("maxPrice", maxPrice);
+
+    const res = await fetch(`${apiUrl}/api/products?${queryParams.toString()}`, { cache: 'no-store' });
     const result = await res.json();
     
-    // ব্যাকএন্ডের রেসপন্স স্ট্রাকচার অনুযায়ী ডেটা অ্যারে নিশ্চিত করা
-    productsData = result.data || result; 
+    productsData = result.data || result.products || []; 
     if (!Array.isArray(productsData)) {
       productsData = [];
     }
@@ -37,35 +44,20 @@ const ProductsPage = async ({ searchParams }) => {
     productsData = [];
   }
 
-  let filteredProducts = selectedCategory === "all"
-    ? productsData
-    : productsData.filter((product) => product.category === selectedCategory);
-
-  filteredProducts = filteredProducts.filter(
-    (product) => product.price >= minPrice && product.price <= maxPrice
-  );
-
-  if (selectedColor !== "all") {
-    filteredProducts = filteredProducts.filter((product) => 
-      product.title.toLowerCase().includes(selectedColor) || 
-      (product.description && product.description.toLowerCase().includes(selectedColor))
-    );
-  }
-
+  // 🟢 সর্টিং লজিক
   if (sortBy === "low-high") {
-    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+    productsData.sort((a, b) => a.price - b.price);
   } else if (sortBy === "high-low") {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
+    productsData.sort((a, b) => b.price - a.price);
   } else if (sortBy === "popularity") {
-    filteredProducts = [...filteredProducts].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    productsData.sort((a, b) => (b.rating || 0) - (a.rating || 0));
   } else if (sortBy === "latest") {
-    filteredProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    productsData.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }
 
-  const totalResults = filteredProducts.length;
+  const totalResults = productsData.length;
   const startIndex = (currentPage - 1) * limit;
-  const endIndex = startIndex + limit;
-  const displayedProducts = filteredProducts.slice(startIndex, endIndex);
+  const displayedProducts = productsData.slice(startIndex, startIndex + limit);
   const currentShowing = displayedProducts.length;
 
   return (
@@ -79,7 +71,7 @@ const ProductsPage = async ({ searchParams }) => {
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6 items-start">
             
-            {/* Left Sidebar with sticky positioning */}
+            {/* Left Sidebar */}
             <div className="lg:col-span-1 sticky top-24">
               <FilterProduct />
             </div>

@@ -1,8 +1,11 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { PlusCircle, Trash2, FolderTree, Image as ImageIcon } from 'lucide-react';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AdminCategories() {
   const [name, setName] = useState('');
@@ -15,12 +18,12 @@ export default function AdminCategories() {
 
   const fetchData = async () => {
     try {
-      const mainRes = await axios.get('http://localhost:5000/api/v1/categories/main-categories');
+      const mainRes = await axios.get(`${API_BASE_URL}/api/v1/categories/main-categories`);
       if (mainRes.data.success) {
         setMainCategories(mainRes.data.data);
       }
 
-      const allRes = await axios.get('http://localhost:5000/api/v1/categories/all');
+      const allRes = await axios.get(`${API_BASE_URL}/api/v1/categories/all`);
       if (allRes.data.success) {
         setCategories(allRes.data.data);
       }
@@ -44,11 +47,11 @@ export default function AdminCategories() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // যদি parent সিলেক্ট করা না থাকে (মানে মেইন ক্যাটাগরি), তবে আইকন বাধ্যতামূলক
+    // Validation Check
     if (!parent && !icon) {
       return toast.warning('Main category icon is required!');
     }
-    if (!name) {
+    if (!name.trim()) {
       return toast.warning('Please provide a category name!');
     }
 
@@ -63,13 +66,14 @@ export default function AdminCategories() {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:5000/api/v1/categories/create', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+
+      // 🟢 'Content-Type' ম্যানুয়ালি বাদ দিয়ে সরাসরি FormData পাঠানো হচ্ছে
+      const res = await axios.post(`${API_BASE_URL}/api/v1/categories/create`, formData, {
         withCredentials: true
       });
 
       if (res.data.success) {
-        toast.success(res.data.message);
+        toast.success(res.data.message || 'Category created successfully!');
         setName('');
         setParent('');
         setIcon(null);
@@ -80,6 +84,7 @@ export default function AdminCategories() {
         fetchData();
       }
     } catch (error) {
+      console.error('Upload Error:', error);
       toast.error(error.response?.data?.message || 'Failed to create category');
     } finally {
       setLoading(false);
@@ -90,7 +95,7 @@ export default function AdminCategories() {
     if (!confirm(`Are you sure to delete "${catName}"?`)) return;
 
     try {
-      const res = await axios.delete(`http://localhost:5000/api/v1/categories/delete/${id}`, {
+      const res = await axios.delete(`${API_BASE_URL}/api/v1/categories/delete/${id}`, {
         withCredentials: true
       });
       if (res.data.success) {
@@ -98,8 +103,13 @@ export default function AdminCategories() {
         fetchData();
       }
     } catch (error) {
-      toast.error('Failed to delete category');
+      toast.error(error.response?.data?.message || 'Failed to delete category');
     }
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return '';
+    return path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
   };
 
   return (
@@ -113,7 +123,7 @@ export default function AdminCategories() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* ফর্ম */}
+        {/* Form */}
         <div className="lg:col-span-1 bg-[#1e293b] p-6 rounded-2xl border border-slate-800 shadow-xl h-fit">
           <h2 className="text-lg font-semibold mb-4 text-orange-400 border-b border-slate-750 pb-3 flex items-center gap-2">
             <PlusCircle size={20} />
@@ -172,7 +182,7 @@ export default function AdminCategories() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 mt-4"
+              className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all shadow-md cursor-pointer flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
             >
               <PlusCircle size={18} />
               <span>{loading ? 'Saving...' : 'Save Category'}</span>
@@ -180,7 +190,7 @@ export default function AdminCategories() {
           </form>
         </div>
 
-        {/* টেবিল */}
+        {/* Table */}
         <div className="lg:col-span-2 bg-[#1e293b] rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
           <div className="p-6 border-b border-slate-800">
             <h2 className="text-lg font-semibold text-slate-200">Category Structure</h2>
@@ -209,7 +219,7 @@ export default function AdminCategories() {
                       <tr className="hover:bg-[#162032] transition-colors">
                         <td className="p-4">
                           {cat.icon ? (
-                            <img src={`http://localhost:5000${cat.icon}`} alt={cat.name} className="w-9 h-9 object-cover rounded-xl border border-slate-700" />
+                            <img src={getImageUrl(cat.icon)} alt={cat.name} className="w-9 h-9 object-cover rounded-xl border border-slate-700" />
                           ) : (
                             <div className="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500"><ImageIcon size={18} /></div>
                           )}
@@ -231,7 +241,7 @@ export default function AdminCategories() {
                         <tr key={sub._id} className="hover:bg-[#162032]/60 transition-colors bg-[#0f172a]/30">
                           <td className="p-4 pl-8">
                             {sub.icon ? (
-                              <img src={`http://localhost:5000${sub.icon}`} alt={sub.name} className="w-7 h-7 object-cover rounded-lg border border-slate-700" />
+                              <img src={getImageUrl(sub.icon)} alt={sub.name} className="w-7 h-7 object-cover rounded-lg border border-slate-700" />
                             ) : (
                               <div className="w-7 h-7 bg-slate-800 rounded-lg flex items-center justify-center text-slate-500"><ImageIcon size={14} /></div>
                             )}

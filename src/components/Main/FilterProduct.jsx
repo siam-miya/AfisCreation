@@ -10,6 +10,8 @@ const MIN_PRICE_LIMIT = 0;
 const MAX_PRICE_LIMIT = 50000;
 const STEP = 100;
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 const FilterProduct = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -22,8 +24,6 @@ const FilterProduct = () => {
 
   const [priceValues, setPriceValues] = useState([currentMinPrice, currentMaxPrice]);
   const [categories, setCategories] = useState([]);
-  
-  // কোন মেইন ক্যাটাগরিগুলো ওপেন আছে তা ট্র্যাক করার জন্য স্টেট (Accordion এর জন্য)
   const [openCategories, setOpenCategories] = useState({});
 
   useEffect(() => {
@@ -33,11 +33,10 @@ const FilterProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/v1/categories/all');
+        const res = await axios.get(`${API_BASE_URL}/api/v1/categories/all`);
         if (res.data.success) {
           setCategories(res.data.data);
           
-          // যদি কারেন্ট ক্যাটাগরি কোনো সাব-ক্যাটাগরি হয়, তবে তার মেইন ক্যাটাগরি ওপেন করে দেওয়া
           res.data.data.forEach(cat => {
             const catSlug = cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-');
             const hasActiveSub = cat.subcategories?.some(sub => {
@@ -66,7 +65,6 @@ const FilterProduct = () => {
   ];
 
   const handleCategoryClick = (cat, catSlug) => {
-    // যদি সাব-ক্যাটাগরি থাকে, তবে ক্লিক করলে টগল হবে (খুলবে বা বন্ধ হবে)
     if (cat.subcategories && cat.subcategories.length > 0) {
       setOpenCategories(prev => ({
         ...prev,
@@ -74,7 +72,6 @@ const FilterProduct = () => {
       }));
     }
     
-    // সাথে প্রোডাক্ট ফিল্টার রাউট আপডেট করা
     const params = new URLSearchParams(searchParams.toString());
     params.set("category", catSlug);
     params.set("page", "1");
@@ -95,6 +92,7 @@ const FilterProduct = () => {
     } else {
       params.set("color", colorValue);
     }
+    params.set("page", "1");
     router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
@@ -102,6 +100,7 @@ const FilterProduct = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("minPrice", priceValues[0].toString());
     params.set("maxPrice", priceValues[1].toString());
+    params.set("page", "1");
     router.push(`/products?${params.toString()}`, { scroll: false });
   };
 
@@ -136,6 +135,7 @@ const FilterProduct = () => {
               onClick={() => {
                 const params = new URLSearchParams(searchParams.toString());
                 params.delete("category");
+                params.set("page", "1");
                 router.push(`/products?${params.toString()}`, { scroll: false });
               }}
               className={`text-sm text-left w-full py-2.5 px-3 rounded-xl transition-all font-medium flex items-center justify-between cursor-pointer ${
@@ -168,7 +168,7 @@ const FilterProduct = () => {
                     <div className="flex items-center gap-2.5">
                       {cat.icon && (
                         <img 
-                          src={cat.icon.startsWith("http") ? cat.icon : `http://localhost:5000${cat.icon}`} 
+                          src={cat.icon.startsWith("http") ? cat.icon : `${API_BASE_URL}${cat.icon}`} 
                           alt={cat.name} 
                           className="w-5 h-5 rounded-md object-cover border border-gray-200" 
                           onError={(e) => { e.target.style.display = 'none'; }}
@@ -182,7 +182,6 @@ const FilterProduct = () => {
                   </button>
                 </li>
 
-                {/* Subcategories - Opens only when isOpen is true */}
                 {cat.subcategories && cat.subcategories.length > 0 && isOpen && (
                   cat.subcategories.map((sub) => {
                     const subSlug = sub.slug || sub.name.toLowerCase().replace(/\s+/g, '-');
@@ -236,7 +235,7 @@ const FilterProduct = () => {
 
       <hr className="border-gray-100" />
 
-      {/* 3. Price Range Slider Filter */}
+      {/* 3. Price Range Slider */}
       <div className="space-y-4">
         <h4 className="font-semibold text-gray-900 tracking-wide uppercase text-xs text-gray-400">Filter By Price</h4>
         
