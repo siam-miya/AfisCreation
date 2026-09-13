@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import main_logo from "../../../../public/main-logo.jpg";
 import Link from 'next/link';
@@ -15,21 +15,9 @@ const Login = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
   
-  // ফিল্ড ওয়াইজ এররের বদলে একটি কমন জেনারেল এরর স্টেট
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    const savedPassword = localStorage.getItem('rememberedPassword');
-    if (savedEmail || savedPassword) {
-      setFormData({
-        email: savedEmail || '',
-        password: savedPassword || ''
-      });
-    }
-  }, []);
 
   const [isForgotMode, setIsForgotMode] = useState(false);
   const [forgotStep, setForgotStep] = useState(1);
@@ -50,16 +38,15 @@ const Login = () => {
       const response = await API.post('/auth/login', formData);
       if (response.data.success) {
         if (response.data.user) {
-          const serverUser = response.data.user;
-          const userData = { ...serverUser };
-          localStorage.setItem('user', JSON.stringify(userData));
-          
-          localStorage.setItem('rememberedEmail', formData.email);
-          localStorage.setItem('rememberedPassword', formData.password);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+          }
 
           window.dispatchEvent(new Event('userStateChanged'));
         }
         router.push('/');
+        router.refresh();
       }
     } catch (err) {
       const errorData = err.response?.data;
@@ -124,9 +111,15 @@ const Login = () => {
         if (response.data.success) {
           const serverUser = response.data.user || {};
           const userData = { ...serverUser, name: serverUser.name || name, email: serverUser.email || email };
+          
           localStorage.setItem('user', JSON.stringify(userData));
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+          }
+
           window.dispatchEvent(new Event('userStateChanged'));
           router.push('/');
+          router.refresh();
         }
       } catch (err) {
         setErrorMessage("Google login failed!");
@@ -142,7 +135,7 @@ const Login = () => {
           <div className='w-full lg:w-[950px] flex justify-center'>
             <Image src={main_logo} height={781} width={950} alt='logo' className="w-full max-w-[300px] md:max-w-[500px] lg:max-w-[950px] h-auto object-contain" />
           </div>
-         
+          
           <div className='w-full max-w-[500px]'>
             <h2 className="text-[28px] md:text-[36px] font-medium text-black font-inter leading-tight">
               {isForgotMode ? 'Reset Password' : <>Log in to <span className='text-primary'>Afis Creation</span></>}
@@ -151,7 +144,6 @@ const Login = () => {
               {isForgotMode ? (forgotStep === 1 ? 'Enter your account email' : 'Enter OTP and new password') : 'Enter your details below'}
             </p>
 
-            {/* ফর্ম ও হেডিংয়ের ঠিক নিচে এক জায়গায় এরর দেখানোর কমন বক্স */}
             {errorMessage && (
               <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm font-poppins">
                 {errorMessage}

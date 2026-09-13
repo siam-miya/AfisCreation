@@ -152,6 +152,17 @@ export default function AdminSidebar() {
           <Mail size={20} />
           <span>Contact Page</span>
         </Link>
+        <Link
+          href="/secret-admin-portal-afia/dashboard/profile"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            pathname.startsWith('/secret-admin-portal-afia/dashboard/contact')
+              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20'
+              : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Mail size={20} />
+          <span>Profile</span>
+        </Link>
       </nav>
     </aside>
   );

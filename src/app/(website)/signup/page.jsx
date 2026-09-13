@@ -15,14 +15,12 @@ const SignUp = () => {
   const [step, setStep] = useState('form');
   const [formData, setFormData] = useState({ name: '', email: '', password: '', otp: '' });
   
-  // আলাদা ফিল্ড এররের পরিবর্তে একটি সিঙ্গেল জেনারেল এরর স্টেট
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // ইউজার টাইপ করা শুরু করলে ওপরের এরর মেসেজ মুছে যাবে
     if (errorMessage) setErrorMessage('');
   };
 
@@ -38,7 +36,6 @@ const SignUp = () => {
       }
     } catch (err) {
       const errorData = err.response?.data;
-      // সব এরর মেসেজ এখন ওপরের একটি নির্দিষ্ট স্টেট এ সেট হবে
       setErrorMessage(errorData?.message || "Something went wrong!");
     } finally {
       setLoading(false);
@@ -63,9 +60,16 @@ const SignUp = () => {
           name: serverUser.name || formData.name,
           email: serverUser.email || formData.email,
         };
+        
+        // LocalStorage-এ ইউজার ডাটা এবং টোকেন সেভ
         localStorage.setItem('user', JSON.stringify(userData));
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+
         window.dispatchEvent(new Event('userStateChanged'));
         router.push('/');
+        router.refresh();
       }
     } catch (err) {
       const errorData = err.response?.data;
@@ -88,9 +92,15 @@ const SignUp = () => {
         if (response.data.success || response.status === 200) {
           const serverUser = response.data.user || {};
           const userData = { ...serverUser, name: serverUser.name || name, email: serverUser.email || email };
+          
           localStorage.setItem('user', JSON.stringify(userData));
+          if (response.data.token) {
+            localStorage.setItem('token', response.data.token);
+          }
+
           window.dispatchEvent(new Event('userStateChanged'));
           router.push('/');
+          router.refresh();
         }
       } catch (err) {
         setErrorMessage("Google authentication failed!");
@@ -106,7 +116,7 @@ const SignUp = () => {
           <div className='w-full lg:w-[950px] flex justify-center'>
             <Image src={main_logo} height={781} width={950} alt='logo' className="w-full h-auto object-contain" />
           </div>
-         
+          
           <div className='w-full max-w-[500px]'>
             <h2 className="text-[36px] font-medium text-black font-inter leading-7">
               {step === 'form' ? 'Create an account' : 'Verify Your Email'}
@@ -115,7 +125,6 @@ const SignUp = () => {
               {step === 'form' ? 'Enter your details below' : `We have sent a 6-digit code to ${formData.email}`}
             </p>
 
-            {/* ফর্মের ঠিক উপরে এক জায়গায় এরর দেখানোর বক্স */}
             {errorMessage && (
               <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm font-poppins">
                 {errorMessage}
@@ -187,7 +196,7 @@ const SignUp = () => {
                   <FcGoogle size={22} />
                   Sign Up with Google
                 </button>
-               
+                
                 <p className="text-center text-gray-600">
                   Already have an account?{" "}
                   <Link href={"/login"} className="font-semibold text-secondary hover:text-primary transition-all underline">
