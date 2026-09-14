@@ -2,8 +2,6 @@ import axios from 'axios';
 
 const rawURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const cleanURL = rawURL.replace(/\/+$/, '');
-
-// স্বয়ংক্রিয়ভাবে একটিমাত্র /api/v1 ফরম্যাট তৈরি করবে
 const baseURL = cleanURL.endsWith('/api/v1')
   ? cleanURL
   : cleanURL.endsWith('/api')
@@ -12,13 +10,18 @@ const baseURL = cleanURL.endsWith('/api/v1')
 
 const API = axios.create({
   baseURL,
-  withCredentials: true,
+  withCredentials: true, // কুকি পাঠানোর জন্য এটি অত্যন্ত জরুরি
 });
 
 API.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
+      // localStorage এর সব সম্ভাব্য নামগুলো এখানে চেক করা হলো যাতে কোনো টোকেন মিস না হয়
+      const token = 
+        localStorage.getItem('token') || 
+        localStorage.getItem('adminToken') || 
+        localStorage.getItem('adminUserToken');
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

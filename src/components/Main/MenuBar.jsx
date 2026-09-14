@@ -16,45 +16,9 @@ import { useWishlistStore } from '@/store/useWishlistStore'
 import { FiUser, FiLogOut, FiHeart } from "react-icons/fi"
 import { toast } from 'react-toastify'
 import { Spinner } from '@heroui/react';
-import { BiLaptop } from "react-icons/bi";
 import { AiOutlineHome, AiOutlineAppstore, AiOutlineUser, AiOutlineInfoCircle } from "react-icons/ai"
-import {
-    FaCar, FaClock, FaHome, FaMobileAlt, FaMotorcycle,
-    FaRedhat, FaRunning, FaShoppingBag, FaTshirt
-} from "react-icons/fa";
-import { FaUserTie } from "react-icons/fa6";
-import {
-    GiBigDiamondRing, GiDelicatePerfume, GiFootprint,
-    Gi3dGlasses, GiLipstick, GiTable, GiShoppingBag as GiShoppingBagIcon
-} from "react-icons/gi";
-import { MdChair, MdOutlineFastfood } from "react-icons/md";
+import { FaShoppingBag } from "react-icons/fa";
 import { TbTruckDelivery } from 'react-icons/tb';
-
-const categoryIcons = {
-    "beauty": <GiLipstick size={18} />,
-    "fragrances": <GiDelicatePerfume size={18} />,
-    "furniture": <MdChair size={18} />,
-    "groceries": <MdOutlineFastfood size={18} />,
-    "home-decoration": <FaHome size={18} />,
-    "kitchen-accessories": <GiTable size={18} />,
-    "laptops": <BiLaptop size={18} />,
-    "mens-shirts": <FaUserTie size={18} />,
-    "mens-shoes": <GiFootprint size={18} />,
-    "mens-watches": <FaClock size={18} />,
-    "mobile-accessories": <FaMobileAlt size={18} />,
-    "motorcycle": <FaMotorcycle size={18} />,
-    "skin-care": <GiLipstick size={18} />,
-    "smartphones": <FaMobileAlt size={18} />,
-    "sports-accessories": <FaRunning size={18} />,
-    "sunglasses": <Gi3dGlasses size={18} />,
-    "tops": <FaTshirt size={18} />,
-    "vehicle": <FaCar size={18} />,
-    "womens-bags": <GiShoppingBagIcon size={18} />,
-    "womens-dresses": <FaRedhat size={18} />,
-    "womens-jewellery": <GiBigDiamondRing size={18} />,
-    "womens-shoes": <GiFootprint size={18} />,
-    "womens-watches": <FaClock size={18} />,
-};
 
 const MenuBar = () => {
     const pathname = usePathname();
@@ -102,11 +66,14 @@ const MenuBar = () => {
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('userLogin', handleStorageChange);
 
-        const fetchCategories = async () => {
+   const fetchCategories = async () => {
             try {
-                const res = await fetch('https://dummyjson.com/products/categories');
+                // `/main-categories` এর বদলে `/all` কল করতে হবে যেন সাব-ক্যাটাগরি সহ ডেটা আসে
+                const res = await fetch('http://localhost:5000/api/v1/categories/all');
                 const data = await res.json();
-                setCategories(data.slice(0, 11));
+                if (data.success) {
+                    setCategories(data.data);
+                }
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
             } finally {
@@ -114,6 +81,7 @@ const MenuBar = () => {
             }
         };
         fetchCategories();
+
 
         const handleScroll = () => {
             if (window.scrollY > 120) {
@@ -132,7 +100,7 @@ const MenuBar = () => {
         };
     }, []);
 
-    // বাইরে ক্লিক করলে ক্যাটেগরি ড্রপডাউন বন্ধ হয়ে যাওয়ার জন্য
+    // বাইরে ক্লিক করলে ক্যাটেগরি ড্রপডাউন বন্ধ হয়ে যাওয়ার জন্য
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (categoryRef.current && !categoryRef.current.contains(event.target)) {
@@ -169,7 +137,7 @@ const MenuBar = () => {
                     <div className={`flex items-center justify-between relative transition-all duration-300 ${isScrolled ? "py-2.5" : ""}`}>
                         <div className="w-[220px] lg:w-[270px] flex-shrink-0 flex items-center">
                             {!isScrolled ? (
-                                <div ref={categoryRef} className="w-full z-20 relative self-start">
+                                <div ref={categoryRef} className="w-full z-25 relative self-start">
                                     <h2 
                                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                         className="bg-[#eb6e1b] text-white py-3.5 px-4 flex items-center justify-between gap-2 font-bold text-sm select-none cursor-pointer rounded-t-md"
@@ -183,23 +151,34 @@ const MenuBar = () => {
                                         </span>
                                     </h2>
 
-                                    <ul className={`w-full bg-white border border-gray-200 shadow-lg p-2 flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] max-h-[450px] overflow-y-auto scrollbar-none ${isCategoryOpen ? 'flex' : 'hidden'}`}>
+                                   <ul className={`w-full bg-white border border-gray-200 shadow-xl p-2 flex-col transition-all duration-200 rounded-b-md absolute left-0 top-[48px] z-[999] ${isCategoryOpen ? 'flex' : 'hidden'}`}>
                                         {loading ? (
                                             <div className="flex flex-col items-center py-5 gap-2">
                                                 <Spinner size="md" color="danger" />
                                                 <span className="text-xs text-[#eb6e1b]">Categories Loading....</span>
                                             </div>
                                         ) : (
-                                            categories.map((cat, index) => (
-                                                <ListItems
-                                                    key={index}
-                                                    text={cat.name}
-                                                    slug={cat.slug}
-                                                    categoryIcon={categoryIcons[cat.slug] || <FaShoppingBag size={18} />}
-                                                    rightIcon={true}
-                                                    onClick={() => setIsCategoryOpen(false)}
-                                                />
-                                            ))
+                                            categories.map((cat, index) => {
+                                                // সব সম্ভাব্য সাব-ক্যাটাগরি প্রপার্টি চেক করা হচ্ছে
+                                                const subs = cat.subcategories || cat.subCategory || cat.children || [];
+                                                return (
+                                                    <ListItems
+                                                        key={cat._id || index}
+                                                        text={cat.name}
+                                                        slug={cat.slug}
+                                                        subcategories={subs}
+                                                        categoryIcon={
+                                                            cat.icon ? (
+                                                                <Image src={cat.icon} alt={cat.name} width={18} height={18} className="object-contain w-[18px] h-[18px]" />
+                                                            ) : (
+                                                                <FaShoppingBag size={18} />
+                                                            )
+                                                        }
+                                                        rightIcon={subs.length > 0}
+                                                        onClick={() => setIsCategoryOpen(false)}
+                                                    />
+                                                );
+                                            })
                                         )}
                                     </ul>
                                 </div>
@@ -310,16 +289,26 @@ const MenuBar = () => {
                                         <span className="text-sm text-[#eb6e1b]">Categories Loading...</span>
                                     </div>
                                 ) : (
-                                    categories.map((cat, index) => (
-                                        <ListItems
-                                            key={index}
-                                            text={cat.name}
-                                            slug={cat.slug}
-                                            categoryIcon={categoryIcons[cat.slug] || <FaShoppingBag size={18} />}
-                                            rightIcon={true}
-                                            onClick={closeDrawer}
-                                        />
-                                    ))
+                                    categories.map((cat, index) => {
+                                        const subs = cat.subcategories || cat.subCategory || cat.children || [];
+                                        return (
+                                            <ListItems
+                                                key={cat._id || index}
+                                                text={cat.name}
+                                                slug={cat.slug}
+                                                subcategories={subs}
+                                                categoryIcon={
+                                                    cat.icon ? (
+                                                        <Image src={cat.icon} alt={cat.name} width={18} height={18} className="object-contain w-[18px] h-[18px]" />
+                                                    ) : (
+                                                        <FaShoppingBag size={18} />
+                                                    )
+                                                }
+                                                rightIcon={subs.length > 0}
+                                                onClick={closeDrawer}
+                                            />
+                                        );
+                                    })
                                 )}
                             </ul>
                         </div>
@@ -389,17 +378,73 @@ const MenuBar = () => {
 
 export default MenuBar
 
-function ListItems({ rightIcon = false, categoryIcon, text, slug, onClick }) {
+function ListItems({
+    rightIcon = false,
+    categoryIcon,
+    text,
+    slug,
+    subcategories = [],
+    onClick
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <li className="w-full text-black hover:bg-gray-50 rounded-xl transition-all" onClick={onClick}>
+        <li
+            className="w-full text-black hover:bg-gray-50 rounded-xl transition-all relative"
+            onMouseEnter={() => {
+                if (subcategories.length > 0) {
+                    setIsOpen(true);
+                }
+            }}
+            onMouseLeave={() => setIsOpen(false)}
+        >
             <Link
                 href={`/products?category=${slug}`}
-                className='grid grid-cols-[24px_1fr_24px] gap-2 items-center py-2.5 px-3'
+                className="grid grid-cols-[24px_1fr_24px] gap-2 items-center py-2.5 px-3"
+                onClick={onClick}
             >
-                <span className="flex items-center justify-center text-gray-500">{categoryIcon}</span>
-                <span className='text-xs sm:text-sm capitalize font-poppins font-medium text-gray-700'>{text}</span>
-                {rightIcon && <MdOutlineKeyboardArrowRight size={18} className="text-gray-400" />}
+                <span className="flex items-center justify-center text-gray-500">
+                    {categoryIcon}
+                </span>
+
+                <span className="text-xs sm:text-sm capitalize font-poppins font-medium text-gray-700">
+                    {text}
+                </span>
+
+                {rightIcon && (
+                    <MdOutlineKeyboardArrowRight
+                        size={18}
+                        className="text-gray-400 justify-self-end"
+                    />
+                )}
             </Link>
+
+            {/* SUBCATEGORY DROPDOWN */}
+            {subcategories.length > 0 && (
+                <div
+                    className={`absolute left-full top-0  w-60 bg-white border border-gray-200 shadow-2xl rounded-xl p-2 z-[99999]
+                    transition-all duration-200
+                    ${
+                        isOpen
+                            ? "opacity-100 visible translate-x-0"
+                            : "opacity-0 invisible -translate-x-2 pointer-events-none"
+                    }`}
+                >
+                    <ul className="flex flex-col gap-1">
+                        {subcategories.map((sub, idx) => (
+                            <li key={sub._id || idx}>
+                                <Link
+                                    href={`/products?category=${sub.slug || sub._id}`}
+                                    onClick={onClick}
+                                    className="block py-2 px-3 text-xs sm:text-sm text-gray-600 hover:bg-gray-100 hover:text-[#eb6e1b] rounded-lg transition-colors capitalize font-poppins font-medium"
+                                >
+                                    {sub.name || sub}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </li>
-    )
+    );
 }

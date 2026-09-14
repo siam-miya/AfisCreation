@@ -7,12 +7,13 @@ import { toast } from 'react-toastify';
 import { GiShoppingBag } from 'react-icons/gi';
 import { IoClose } from 'react-icons/io5';
 import { Spinner } from '@heroui/react';
-import { useSearchParams } from 'next/navigation';
-import { HiPlus, HiMinus } from 'react-icons/hi2';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const CheckoutForm = () => {
-  const { cart, shippingMethod, setShippingMethod, removeFromCart, updateQuantity } = useCartStore();
+  const router = useRouter();
+  const { cart, shippingMethod, setShippingMethod, removeFromCart, updateQuantity, clearCart } = useCartStore();
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const searchParams = useSearchParams();
   const isBuyNow = searchParams.get('buyNow') === 'true';
@@ -30,13 +31,13 @@ const CheckoutForm = () => {
   }, []);
 
   if (!isMounted) return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 py-10">
       <Spinner color="danger" />
       <span className="text-xs text-muted">loading...</span>
     </div>
   );
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((total, item) => total + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
   const shippingCharge = shippingMethod === 'inside' ? 70 : 130;
   const totalCost = subtotal + shippingCharge;
 
@@ -48,14 +49,7 @@ const CheckoutForm = () => {
     }));
   };
 
-  const handleQuantityChange = (id, newQty) => {
-    if (newQty < 1) return;
-    if (updateQuantity) {
-      updateQuantity(id, newQty);
-    }
-  };
-
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (cart.length === 0) {
       toast.error('Your cart is empty!');
@@ -65,9 +59,54 @@ const CheckoutForm = () => {
       toast.error('Please fill in all required fields.');
       return;
     }
-    
-    // formData.orderNotes can now be submitted along with your order payload
-    toast.success('Order placed successfully!');
+
+    setIsLoading(true);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          cart,
+          shippingMethod,
+          shippingCharge,
+          totalCost,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Order placed successfully!');
+        const generatedOrderId = data.orderId || `AFIS-${Math.floor(100000 + Math.random() * 900000)}`;
+        
+        if (clearCart) clearCart();
+
+        const queryParams = new URLSearchParams({
+          orderId: generatedOrderId,
+          name: formData.fullName,
+          phone: formData.phoneNumber,
+          address: formData.streetAddress,
+          shippingMethod: shippingMethod,
+          shippingCharge: shippingCharge.toString(),
+          total: totalCost.toString(),
+          cart: JSON.stringify(cart),
+        });
+
+        router.push(`/thank-you?${queryParams.toString()}`);
+      } else {
+        toast.error(data.message || 'Something went wrong!');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Server connection error! Please check backend.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,25 +125,19 @@ const CheckoutForm = () => {
           <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} className="w-full bg-[#F5F5F5] rounded p-3 focus:outline-none" required />
         </div>
 
-        {/* Added Customization / Order Notes Textarea */}
         <div>
           <label className="block text-gray-400 text-sm mb-2">
-           Add a note to customize your product <span className="text-gray-400 font-normal">(Optional)</span>
+            Add a note to customize your product <span className="text-gray-400 font-normal">(Optional)</span>
           </label>
           <textarea
             name="orderNotes"
             rows={3}
             value={formData.orderNotes}
             onChange={handleInputChange}
-            placeholder="Notes about your order, e.g. special instructions for customization or delivery."
+            placeholder="Notes about your order..."
             className="w-full bg-[#F5F5F5] rounded p-3 focus:outline-none resize-none text-sm"
           />
         </div>
-
-        <label className="flex items-center space-x-3 cursor-pointer select-none">
-          <input type="checkbox" name="saveInfo" checked={formData.saveInfo} onChange={handleInputChange} className="w-5 h-5 accent-[#DB4444]" />
-          <span className="text-sm font-medium">Save this information for faster check-out</span>
-        </label>
       </div>
 
       <div className="space-y-6 w-full">
@@ -112,71 +145,54 @@ const CheckoutForm = () => {
           {cart.length === 0 ? (
             <p className="text-sm text-gray-500 py-4">Your cart is empty.</p>
           ) : (
-            cart.map((item) => (
-              <div key={item.id} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-none">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative pt-1 pl-1 flex-shrink-0">
-                    <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg p-1 flex items-center justify-center">
-                      <Image
-                        src={item.thumbnail}
-                        alt={item.title}
-                        width={40}
-                        height={40}
-                        className="object-contain w-full h-full"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart && removeFromCart(item.id)}
-                      className="absolute -top-1 -left-1 bg-[#E53E3E] hover:bg-red-700 text-white rounded-full p-0.5 shadow-md transition-transform hover:scale-110 z-10 flex items-center justify-center cursor-pointer"
-                      title="Remove item"
-                    >
-                      <IoClose className="text-xs" />
-                    </button>
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-medium truncate text-gray-800 max-w-[150px] sm:max-w-[200px]">
-                      {item.title} {!isBuyNow && `(x${item.quantity})`}
-                    </span>
+            cart.map((item, idx) => {
+              const itemId = item._id || item.id || idx;
+              const itemPrice = Number(item.price) || 0;
+              const itemQty = Number(item.quantity) || 1;
 
-                    {isBuyNow && (
-                      <div className="flex items-center border border-gray-300 rounded w-fit mt-1 bg-white">
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                          className="px-1.5 py-0.5 text-gray-600 hover:bg-gray-100 border-r border-gray-200"
-                        >
-                          <HiMinus className="text-xs" />
-                        </button>
-                        <span className="px-2 text-xs font-semibold text-gray-800">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                          className="px-1.5 py-0.5 text-gray-600 hover:bg-gray-100 border-l border-gray-200"
-                        >
-                          <HiPlus className="text-xs" />
-                        </button>
+              return (
+                <div key={itemId} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-none">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative pt-1 pl-1 flex-shrink-0">
+                      <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg p-1 flex items-center justify-center">
+                        <Image
+                          src={item.thumbnail || '/placeholder.png'}
+                          alt={item.title || 'Product'}
+                          width={40}
+                          height={40}
+                          className="object-contain w-full h-full"
+                        />
                       </div>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart && removeFromCart(itemId)}
+                        className="absolute -top-1 -left-1 bg-[#E53E3E] text-white rounded-full p-0.5 z-10 flex items-center justify-center cursor-pointer"
+                      >
+                        <IoClose className="text-xs" />
+                      </button>
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-medium truncate text-gray-800 max-w-[150px]">
+                        {item.title} {!isBuyNow && `(x${itemQty})`}
+                      </span>
+                    </div>
                   </div>
+                  <span className="font-semibold text-gray-900 flex-shrink-0">৳{(itemPrice * itemQty).toFixed(2)}</span>
                 </div>
-
-                <span className="font-semibold text-gray-900 flex-shrink-0">৳{(item.price * item.quantity).toFixed(2)}</span>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
+
         <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-700">Select Shipping Area:</p>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="radio" name="shipping" checked={shippingMethod === 'inside'} onChange={() => setShippingMethod('inside')} className="accent-primary" />
+              <input type="radio" name="shipping" checked={shippingMethod === 'inside'} onChange={() => setShippingMethod('inside')} />
               <span>Inside Dhaka (৳70)</span>
             </label>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input type="radio" name="shipping" checked={shippingMethod === 'outside'} onChange={() => setShippingMethod('outside')} className="accent-primary" />
+              <input type="radio" name="shipping" checked={shippingMethod === 'outside'} onChange={() => setShippingMethod('outside')} />
               <span>Outside Dhaka (৳130)</span>
             </label>
           </div>
@@ -199,10 +215,10 @@ const CheckoutForm = () => {
 
         <button
           type="submit"
-          className="bg-primary text-white py-3 w-full rounded-br-3xl rounded-tl-3xl hover:bg-secondary transition-all font-semibold cursor-pointer flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className="bg-primary text-white py-3 w-full rounded-br-3xl rounded-tl-3xl hover:bg-secondary transition-all font-semibold cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
         >
-          <GiShoppingBag className="text-xl" />
-          <span>Order now</span>
+          {isLoading ? <Spinner size="sm" color="white" /> : <><GiShoppingBag className="text-xl" /><span>Order now</span></>}
         </button>
       </div>
     </form>

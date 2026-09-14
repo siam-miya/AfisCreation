@@ -2,7 +2,7 @@
 import Topbar from "@/components/Main/Topbar";
 import Navbar from "@/components/Main/Navbar";
 import Footer from "@/components/Main/Footer";
-import MenuBar from "@/components/Main/MenuBar";
+import MenuBar from "./../../components/Main/MenuBar";
 import MultiChatFAB from "@/components/Main/MultiChatFAB";
 
 export default function UserLayout({ children }) {
