@@ -6,12 +6,19 @@ import RelatedProductsSlider from "@/components/Main/RelatedProductsSlider";
 export async function generateMetadata({ params }) {
   const { id } = await params;
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${id}`, { cache: 'no-store' });
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const res = await fetch(`${apiUrl}/api/products/${id}`, { cache: 'no-store' });
     const data = await res.json();
-    return {
-      title: data.success && data.data ? `${data.data.title} || Afis Creation` : "Product Details",
-      description: data.success && data.data ? data.data.description : "Afis Creation product details page",
-    };
+    
+    if (data.success && data.data) {
+      const product = data.data;
+      return {
+        // ব্যাকএন্ডে দেওয়া metaTitle বা প্রোডাক্টের title ব্যবহার করা হচ্ছে
+        title: product.metaTitle ? `${product.metaTitle} || Afis Creation` : `${product.title} || Afis Creation`,
+        description: product.metaDescription || product.description?.substring(0, 150) || "Afis Creation product details page",
+      };
+    }
+    return { title: "Product Details || Afis Creation" };
   } catch {
     return { title: "Product Details || Afis Creation" };
   }
@@ -19,9 +26,10 @@ export async function generateMetadata({ params }) {
 
 const ProductDetailsPage = async ({ params }) => {
   const { id } = await params;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   // ১. ব্যাকএন্ড থেকে সিঙ্গেল প্রোডাক্ট ফেচ করা
-  const res = await fetch(`http://localhost:5000/api/products/${id}`, { cache: 'no-store' });
+  const res = await fetch(`${apiUrl}/api/products/${id}`, { cache: 'no-store' });
   const result = await res.json();
   const findData = result.success ? result.data : null;
 
@@ -30,7 +38,7 @@ const ProductDetailsPage = async ({ params }) => {
   }
 
   // ২. একই ক্যাটাগরির রিলেটেড প্রোডাক্ট ফেচ করা
-  const relatedRes = await fetch(`http://localhost:5000/api/products/category/${findData.category}/${findData._id}`, { cache: 'no-store' });
+  const relatedRes = await fetch(`${apiUrl}/api/products/category/${findData.category}/${findData._id}`, { cache: 'no-store' });
   const relatedResult = await relatedRes.json();
   const relatedProducts = relatedResult.success ? relatedResult.data : [];
 
@@ -43,6 +51,7 @@ const ProductDetailsPage = async ({ params }) => {
         <div className="pt-6">
           <p className="hidden md:block text-black font-semibold mb-6">
             <span className="font-bold text-black">Product Name:</span> {findData.title}
+            {findData.sku && <span className="ml-4 text-xs text-gray-500 font-normal">(SKU: {findData.sku})</span>}
           </p>
           
           <div className="mb-10">

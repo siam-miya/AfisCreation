@@ -9,25 +9,29 @@ export const useCartStore = create(
 
       addToCart: (product) => set((state) => {
         const productId = product._id || product.id;
-        const existingItem = state.cart.find((item) => (item._id || item.id) === productId);
+        const cartItemId = product.cartItemId || `${productId}-${product.selectedColor || ''}-${product.selectedSize || ''}-${product.productNote || ''}`;
+        
+        const existingItem = state.cart.find((item) => item.cartItemId === cartItemId);
         
         if (existingItem) {
           return {
             cart: state.cart.map((item) =>
-              (item._id || item.id) === productId ? { ...item, quantity: item.quantity + (product.quantity || 1) } : item
+              item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + (product.quantity || 1) } : item
             ),
           };
         }
-        return { cart: [...state.cart, { ...product, quantity: product.quantity || 1 }] };
+        return { cart: [...state.cart, { ...product, id: productId, cartItemId, quantity: product.quantity || 1 }] };
       }),
 
-      removeFromCart: (productId) => set((state) => ({
-        cart: state.cart.filter((item) => (item._id || item.id) !== productId),
+      removeFromCart: (cartItemId) => set((state) => ({
+        cart: state.cart.filter((item) => item.cartItemId !== cartItemId && (item._id || item.id) !== cartItemId),
       })),
 
-      updateQuantity: (productId, quantity) => set((state) => ({
+      updateQuantity: (cartItemId, quantity) => set((state) => ({
         cart: state.cart.map((item) =>
-          (item._id || item.id) === productId ? { ...item, quantity: Math.max(1, quantity) } : item
+          (item.cartItemId === cartItemId || (item._id || item.id) === cartItemId) 
+            ? { ...item, quantity: Math.max(1, quantity) } 
+            : item
         ),
       })),
 

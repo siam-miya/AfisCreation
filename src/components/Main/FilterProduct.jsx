@@ -24,12 +24,14 @@ const FilterProduct = () => {
 
   const [priceValues, setPriceValues] = useState([currentMinPrice, currentMaxPrice]);
   const [categories, setCategories] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]);
   const [openCategories, setOpenCategories] = useState({});
 
   useEffect(() => {
     setPriceValues([currentMinPrice, currentMaxPrice]);
   }, [currentMinPrice, currentMaxPrice]);
 
+  // ক্যাটাগরি ফেচ করা
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -55,14 +57,20 @@ const FilterProduct = () => {
     fetchCategories();
   }, [currentCategory]);
 
-  const colors = [
-    { name: "All", value: "all", bgClass: "bg-gray-200" },
-    { name: "Red", value: "red", bgClass: "bg-red-500" },
-    { name: "Blue", value: "blue", bgClass: "bg-blue-500" },
-    { name: "Black", value: "black", bgClass: "bg-gray-900" },
-    { name: "White", value: "white", bgClass: "bg-white border border-gray-300" },
-    { name: "Green", value: "green", bgClass: "bg-green-500" },
-  ];
+  // ডায়নামিক কালার ফেচ করা
+  useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/products/colors/all`);
+        if (res.data.success) {
+          setAvailableColors(res.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch filter colors:", error);
+      }
+    };
+    fetchColors();
+  }, []);
 
   const handleCategoryClick = (cat, catSlug) => {
     if (cat.subcategories && cat.subcategories.length > 0) {
@@ -212,21 +220,38 @@ const FilterProduct = () => {
 
       <hr className="border-gray-100" />
 
-      {/* 2. Color Filter */}
+      {/* 2. Dynamic Color Filter */}
       <div className="space-y-3">
         <h4 className="font-semibold text-gray-900 tracking-wide uppercase text-xs text-gray-400">Filter by Color</h4>
         <div className="grid grid-cols-3 gap-2">
-          {colors.map((c) => (
+          {/* All Option */}
+          <button
+            onClick={() => handleColorChange("all")}
+            className={`flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-xl border transition-all cursor-pointer ${
+              currentColor === "all"
+                ? "border-black bg-gray-50 text-black font-semibold ring-1 ring-black"
+                : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/50"
+            }`}
+          >
+            <span className="w-3 h-3 rounded-full shrink-0 shadow-sm bg-gray-200 border border-gray-300" />
+            <span className="truncate">All</span>
+          </button>
+
+          {/* Database Dynamic Colors */}
+          {availableColors.map((c) => (
             <button
-              key={c.value}
-              onClick={() => handleColorChange(c.value)}
+              key={c.name}
+              onClick={() => handleColorChange(c.name)}
               className={`flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-xl border transition-all cursor-pointer ${
-                currentColor === c.value
+                currentColor.toLowerCase() === c.name.toLowerCase()
                   ? "border-black bg-gray-50 text-black font-semibold ring-1 ring-black"
                   : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/50"
               }`}
             >
-              <span className={`w-3 h-3 rounded-full shrink-0 shadow-sm ${c.bgClass}`} />
+              <span 
+                className="w-3 h-3 rounded-full shrink-0 shadow-sm border border-gray-300" 
+                style={{ backgroundColor: c.code || '#cccccc' }} 
+              />
               <span className="truncate">{c.name}</span>
             </button>
           ))}

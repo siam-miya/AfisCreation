@@ -141,18 +141,18 @@ const CheckoutForm = () => {
       </div>
 
       <div className="space-y-6 w-full">
-        <div className="max-h-[300px] overflow-y-auto pr-2 pl-2 pt-2 space-y-4">
+        <div className="max-h-[350px] overflow-y-auto pr-2 pl-2 pt-2 space-y-4">
           {cart.length === 0 ? (
             <p className="text-sm text-gray-500 py-4">Your cart is empty.</p>
           ) : (
             cart.map((item, idx) => {
-              const itemId = item._id || item.id || idx;
+              const uniqueKey = item.cartItemId || item._id || item.id || idx;
               const itemPrice = Number(item.price) || 0;
               const itemQty = Number(item.quantity) || 1;
 
               return (
-                <div key={itemId} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-none">
-                  <div className="flex items-center gap-3 min-w-0">
+                <div key={uniqueKey} className="flex items-start justify-between gap-3 py-3 border-b border-gray-100 last:border-none">
+                  <div className="flex items-start gap-3 min-w-0">
                     <div className="relative pt-1 pl-1 flex-shrink-0">
                       <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg p-1 flex items-center justify-center">
                         <Image
@@ -165,19 +165,33 @@ const CheckoutForm = () => {
                       </div>
                       <button
                         type="button"
-                        onClick={() => removeFromCart && removeFromCart(itemId)}
+                        onClick={() => removeFromCart && removeFromCart(item.cartItemId || uniqueKey)}
                         className="absolute -top-1 -left-1 bg-[#E53E3E] text-white rounded-full p-0.5 z-10 flex items-center justify-center cursor-pointer"
                       >
                         <IoClose className="text-xs" />
                       </button>
                     </div>
+
+                    {/* প্রোডাক্টের নাম, কালার, সাইজ এবং কাস্টমাইজেশন ডিটেইলস */}
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-medium truncate text-gray-800 max-w-[150px]">
+                      <span className="text-sm font-medium text-gray-800">
                         {item.title} {!isBuyNow && `(x${itemQty})`}
                       </span>
+                      
+                      <div className="text-xs text-gray-500 flex flex-wrap gap-x-2 mt-0.5">
+                        {item.selectedColor && <span>Color: <strong className="text-gray-700">{item.selectedColor}</strong></span>}
+                        {item.selectedSize && <span>Size: <strong className="text-gray-700">{item.selectedSize}</strong></span>}
+                      </div>
+
+                      {item.productNote && (
+                        <span className="text-[11px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded mt-1 border border-amber-200 truncate max-w-[200px]">
+                          Note: {item.productNote}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <span className="font-semibold text-gray-900 flex-shrink-0">৳{(itemPrice * itemQty).toFixed(2)}</span>
+                  
+                  <span className="font-semibold text-gray-900 flex-shrink-0 text-sm">৳{(itemPrice * itemQty).toFixed(2)}</span>
                 </div>
               );
             })

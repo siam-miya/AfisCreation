@@ -8,13 +8,25 @@ export default function ProductCard({ product }) {
   const imageSrc = product?.thumbnail || null;
   if (!imageSrc) return null;
 
+  // ডিসকাউন্ট ক্যালকুলেশন (যদি discountPrice থাকে এবং মূল মূল্য থেকে কম হয়)
+  const hasDiscount = product.discountPrice && product.discountPrice > 0 && product.discountPrice < product.price;
+  const discountPercentage = hasDiscount 
+    ? Math.round(((product.price - product.discountPrice) / product.price) * 100) 
+    : 0;
+
   return (
     <div className="group w-full xs:max-w-[310px] mx-auto rounded-xl overflow-hidden font-poppins bg-[#FAFAFA] hover:shadow-2xl sm:hover:-translate-y-2 transition-all duration-300 border border-gray-100 hover:border-gray-200 will-change-transform flex flex-col justify-between h-full">
 
-      {/* এখানে product.id এর পরিবর্তে product._id দেওয়া হয়েছে যাতে undefined না আসে */}
       <Link href={`/products/${product._id || product.id}`} className="block flex-1">
         {/* Image Container */}
         <div className="relative w-full h-[260px] xs:h-[300px] sm:h-[340px] md:h-[380px] flex items-center justify-center overflow-hidden bg-white p-2">
+
+          {/* Discount Badge */}
+          {hasDiscount && (
+            <span className="absolute top-3 left-3 bg-red-600 text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-md z-10 shadow-md">
+              -{discountPercentage}%
+            </span>
+          )}
 
           {/* Wishlist & Quick View Buttons */}
           <div className="absolute top-3 right-3 flex flex-col items-center gap-2 z-10 md:translate-x-4 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100 transition-all duration-300 ease-in-out">
@@ -24,7 +36,6 @@ export default function ProductCard({ product }) {
             </span>
           </div>
 
-          {/* Product Image: object-contain use kora holo jate image er kono part kete na jay, purota dekhabe */}
           <Image
             src={imageSrc}
             alt={product.title || "fashion item"}
@@ -41,10 +52,22 @@ export default function ProductCard({ product }) {
           </h3>
 
           <div className="flex items-center space-x-2">
-            <span className="text-gray-900 text-sm sm:text-base font-bold">
-              <span className="font-semibold text-xs sm:text-sm font-inter mr-0.5">৳</span>
-              {product.price}
-            </span>
+            {hasDiscount ? (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-900 text-sm sm:text-base font-bold">
+                  <span className="font-semibold text-xs sm:text-sm font-inter mr-0.5">৳</span>
+                  {product.discountPrice}
+                </span>
+                <span className="text-gray-400 text-xs sm:text-sm line-through">
+                  ৳{product.price}
+                </span>
+              </div>
+            ) : (
+              <span className="text-gray-900 text-sm sm:text-base font-bold">
+                <span className="font-semibold text-xs sm:text-sm font-inter mr-0.5">৳</span>
+                {product.price}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center pt-0.5">

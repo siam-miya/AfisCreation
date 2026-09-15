@@ -25,7 +25,6 @@ const ProductsPage = async ({ searchParams }) => {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     
-    // 🟢 ব্যাকএন্ডে সরাসরি প্যারামিটার পাঠানোর জন্য URL Query গঠন
     const queryParams = new URLSearchParams();
     if (selectedCategory !== "all") queryParams.append("category", selectedCategory);
     if (selectedColor !== "all") queryParams.append("color", selectedColor);
@@ -44,11 +43,19 @@ const ProductsPage = async ({ searchParams }) => {
     productsData = [];
   }
 
-  // 🟢 সর্টিং লজিক
+  // সর্টিং লজিক (ডিসকাউন্ট প্রাইস থাকলে তা প্রাধান্য পাবে, না থাকলে মূল প্রাইস)
   if (sortBy === "low-high") {
-    productsData.sort((a, b) => a.price - b.price);
+    productsData.sort((a, b) => {
+      const priceA = a.discountPrice > 0 ? a.discountPrice : a.price;
+      const priceB = b.discountPrice > 0 ? b.discountPrice : b.price;
+      return priceA - priceB;
+    });
   } else if (sortBy === "high-low") {
-    productsData.sort((a, b) => b.price - a.price);
+    productsData.sort((a, b) => {
+      const priceA = a.discountPrice > 0 ? a.discountPrice : a.price;
+      const priceB = b.discountPrice > 0 ? b.discountPrice : b.price;
+      return priceB - priceA;
+    });
   } else if (sortBy === "popularity") {
     productsData.sort((a, b) => (b.rating || 0) - (a.rating || 0));
   } else if (sortBy === "latest") {

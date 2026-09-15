@@ -66,7 +66,7 @@ const MenuBar = () => {
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('userLogin', handleStorageChange);
 
-   const fetchCategories = async () => {
+        const fetchCategories = async () => {
             try {
                 // `/main-categories` এর বদলে `/all` কল করতে হবে যেন সাব-ক্যাটাগরি সহ ডেটা আসে
                 const res = await fetch('http://localhost:5000/api/v1/categories/all');
@@ -81,7 +81,6 @@ const MenuBar = () => {
             }
         };
         fetchCategories();
-
 
         const handleScroll = () => {
             if (window.scrollY > 120) {
@@ -130,6 +129,11 @@ const MenuBar = () => {
         router.push('/login');
     }
 
+    // প্রফাইলের ছবির সম্ভাব্য প্রপার্টিগুলো চেক করার একটি ছোট ফাংশন
+    const getUserImage = () => {
+        return user?.picture || user?.avatar || user?.photo || user?.image || user?.profilePic;
+    };
+
     return (
         <>
             <section className="hidden lg:block bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm transition-all duration-300">
@@ -159,7 +163,6 @@ const MenuBar = () => {
                                             </div>
                                         ) : (
                                             categories.map((cat, index) => {
-                                                // সব সম্ভাব্য সাব-ক্যাটাগরি প্রপার্টি চেক করা হচ্ছে
                                                 const subs = cat.subcategories || cat.subCategory || cat.children || [];
                                                 return (
                                                     <ListItems
@@ -217,8 +220,8 @@ const MenuBar = () => {
 
                                     <div className='relative group pt-2 pb-2 -my-2'>
                                         <Link href={user ? "/user/profile" : "/login"} className='cursor-pointer flex items-center justify-center rounded-full hover:bg-[#eb6e1b] hover:text-white transition-all border overflow-hidden w-9 h-9 bg-gray-100 text-black font-bold'>
-                                            {user?.picture ? (
-                                                <Image src={user.picture} alt="User" width={36} height={36} className="rounded-full object-cover w-full h-full" />
+                                            {getUserImage() ? (
+                                                <Image src={getUserImage()} alt="User" width={36} height={36} className="rounded-full object-cover w-full h-full" />
                                             ) : user?.name ? (
                                                 <span className="text-xs uppercase">{user.name.charAt(0)}</span>
                                             ) : (
@@ -261,8 +264,8 @@ const MenuBar = () => {
 
                         <div className="mt-6 bg-[#eb6e1b] rounded-2xl p-4 text-white flex items-center gap-4 shadow-md">
                             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white border border-white/30 overflow-hidden font-bold flex-shrink-0">
-                                {user?.picture ? (
-                                    <Image src={user.picture} alt="User" width={48} height={48} className="rounded-full object-cover w-full h-full" />
+                                {getUserImage() ? (
+                                    <Image src={getUserImage()} alt="User" width={48} height={48} className="rounded-full object-cover w-full h-full" />
                                 ) : user?.name ? (
                                     <span className="text-sm uppercase">{user.name.charAt(0)}</span>
                                 ) : (
@@ -368,7 +371,15 @@ const MenuBar = () => {
                 </Link>
 
                 <Link href={user ? "/user/profile" : "/login"} className={`flex flex-col items-center justify-center w-full text-center gap-0.5 text-[10px] ${pathname.startsWith('/user') ? "text-black font-semibold" : ""}`}>
-                    <AiOutlineUser size={22} />
+                    <div className="w-[22px] h-[22px] rounded-full overflow-hidden flex items-center justify-center bg-white/20 border border-white/30 text-white font-bold">
+                        {getUserImage() ? (
+                            <Image src={getUserImage()} alt="User" width={22} height={22} className="rounded-full object-cover w-full h-full" />
+                        ) : user?.name ? (
+                            <span className="text-[10px] uppercase">{user.name.charAt(0)}</span>
+                        ) : (
+                            <AiOutlineUser size={22} />
+                        )}
+                    </div>
                     <span>ACCOUNT</span>
                 </Link>
             </div>

@@ -13,16 +13,28 @@ const AddToCartButton = ({ product }) => {
     e.preventDefault();
 
     const productId = product._id || product.id;
-    const isAlreadyInCart = cart.some((item) => (item._id || item.id) === productId);
+    const selectedColor = product.selectedColor || '';
+    const selectedSize = product.selectedSize || '';
+    const productNote = product.productNote || '';
+
+    // ইউনিক কার্ট আইটেম আইডি তৈরি যাতে একই প্রোডাক্ট আলাদা কালার/সাইজে আলাদাভাবে কার্টে থাকতে পারে
+    const cartItemId = `${productId}-${selectedColor}-${selectedSize}-${productNote}`;
+
+    const isAlreadyInCart = cart.some((item) => item.cartItemId === cartItemId);
 
     if (isAlreadyInCart) {
-      toast.info(`"${product.title}" is already in cart!`, { position: "top-center", autoClose: 2000 });
+      toast.info(`"${product.title}" with this customization is already in cart!`, { position: "top-center", autoClose: 2000 });
       return;
     }
 
-    // সঠিক আইডি সহ প্রোডাক্ট অবজেক্ট পাস করা হচ্ছে
-    addToCart({ ...product, id: productId });
-    toast.success(`${product.title} added!`, { position: "top-center", autoClose: 1500 });
+    // কার্ট স্টোরে ডেটা পাঠানো হচ্ছে
+    addToCart({ 
+      ...product, 
+      id: productId,
+      cartItemId 
+    });
+    
+    toast.success(`${product.title} added to cart!`, { position: "top-center", autoClose: 1500 });
   };
 
   return (
