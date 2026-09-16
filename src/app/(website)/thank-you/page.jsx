@@ -24,38 +24,52 @@ function ThankYouContent() {
   });
 
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const invoiceRef = useRef(null); // প্রফেশনাল ইনভয়েস প্রিন্ট করার জন্য রেফারেন্স
+  const invoiceRef = useRef(null);
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId') || 'AFIS-' + Math.floor(100000 + Math.random() * 900000);
-    const name = searchParams.get('name') || 'Valued Customer';
-    const phone = searchParams.get('phone') || 'N/A';
-    const address = searchParams.get('address') || 'Dhaka';
-    const shippingCharge = Number(searchParams.get('shippingCharge')) || 0;
-    const total = Number(searchParams.get('total')) || 0;
-    
-    let cart = [];
-    try {
-      const cartParam = searchParams.get('cart');
-      if (cartParam) {
-        cart = JSON.parse(decodeURIComponent(cartParam));
-      }
-    } catch (e) {
-      console.error('Cart parse error:', e);
-    }
+    const orderId = searchParams.get('orderId');
 
-    setOrderDetails({
-      orderId,
-      name,
-      phone,
-      address,
-      shippingCost: shippingCharge,
-      cart,
-      total,
-    });
+    if (orderId) {
+      // লোকালস্টোরেজ থেকে অর্ডারের সিকিউরড ডেটা লোড করা হচ্ছে
+      const savedOrder = localStorage.getItem(`order_${orderId}`);
+      if (savedOrder) {
+        try {
+          const parsedData = JSON.parse(savedOrder);
+          setOrderDetails((prev) => ({
+            ...prev,
+            ...parsedData,
+          }));
+          return;
+        } catch (e) {
+          console.error('Failed to parse order from localStorage', e);
+        }
+      }
+
+      // যদি লোকালস্টোরেজে না থাকে, তবে ব্যাকএন্ড থেকে ফেচ করার ফলব্যাক রাখা হলো (প্রোডাকশন স্ট্যান্ডার্ড)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      fetch(`${apiUrl}/api/orders/${orderId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data) {
+            setOrderDetails({
+              orderId: data.orderId || orderId,
+              name: data.fullName || 'Valued Customer',
+              phone: data.phoneNumber || 'N/A',
+              email: 'support@afiscreation.com',
+              address: data.streetAddress || 'Dhaka',
+              city: 'Dhaka',
+              shippingCost: data.shippingCharge || 0,
+              paymentMethod: 'Cash on Delivery',
+              cart: data.cart || [],
+              total: data.totalCost || 0,
+            });
+          }
+        })
+        .catch((err) => console.error('Error fetching order from backend:', err));
+    }
   }, [searchParams]);
 
-  // প্রফেশনাল পিডিএফ ইনভয়েস ডাউনলোড ফাংশন
+  // প্রফেশনাল পিডিএফ ইনভয়েস ডাউনলোড ফাংশন
   const downloadInvoicePdf = async () => {
     if (!invoiceRef.current) return;
     setIsGeneratingPdf(true);
@@ -94,7 +108,7 @@ function ThankYouContent() {
 
           <div className="inline-block bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 mb-6">
             <span className="text-sm text-gray-500">Order ID: </span>
-            <span className="font-mono font-bold text-gray-800">{orderDetails.orderId}</span>
+            <span className="font-mono font-bold text-gray-800">{orderDetails.orderId || 'Processing...'}</span>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
@@ -156,7 +170,6 @@ function ThankYouContent() {
                       <p className="text-gray-900 font-semibold">{item.title}</p>
                       <p className="text-xs text-gray-500">Qty: {item.quantity || 1} | Price: ৳{item.price} each</p>
                       
-                      {/* কালার এবং সাইজ শো করার অপশন */}
                       <div className="flex flex-wrap gap-1.5 mt-1">
                         {item.selectedColor && (
                           <span className="bg-gray-100 text-gray-800 text-[10px] px-1.5 py-0.5 rounded border border-gray-200 font-medium">
@@ -170,7 +183,6 @@ function ThankYouContent() {
                         )}
                       </div>
 
-                      {/* কাস্টমাইজেশন ডিটেইলস */}
                       {item.customization && (item.customization.length || item.customization.width || item.customization.sleeve || item.customization.instructions) && (
                         <div className="mt-1.5 text-xs bg-amber-50 text-amber-900 p-2 rounded border border-amber-200 space-y-0.5">
                           <p className="font-bold">Customization:</p>
@@ -181,7 +193,6 @@ function ThankYouContent() {
                         </div>
                       )}
 
-                      {/* প্রোডাক্ট স্পেসিফিক নোট */}
                       {item.productNote && (
                         <p className="text-xs italic text-indigo-600 mt-1">Note: {item.productNote}</p>
                       )}

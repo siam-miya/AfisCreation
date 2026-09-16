@@ -57,11 +57,11 @@ const FilterProduct = () => {
     fetchCategories();
   }, [currentCategory]);
 
-  // ডায়নামিক কালার ফেচ করা
+  // ডায়নামিক কালার ফেচ করা (v1 যুক্ত করা হয়েছে)
   useEffect(() => {
     const fetchColors = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/products/colors/all`);
+        const res = await axios.get(`${API_BASE_URL}/api/v1/products/colors/all`);
         if (res.data.success) {
           setAvailableColors(res.data.data);
         }

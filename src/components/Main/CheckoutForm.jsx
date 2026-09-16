@@ -11,7 +11,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 const CheckoutForm = () => {
   const router = useRouter();
-  const { cart, shippingMethod, setShippingMethod, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { cart, shippingMethod, setShippingMethod, removeFromCart, clearCart } = useCartStore();
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -84,20 +84,22 @@ const CheckoutForm = () => {
         toast.success('Order placed successfully!');
         const generatedOrderId = data.orderId || `AFIS-${Math.floor(100000 + Math.random() * 900000)}`;
         
-        if (clearCart) clearCart();
-
-        const queryParams = new URLSearchParams({
+        // ব্যাকআপ ও সুরক্ষার জন্য অর্ডারের ডেটা লোকালস্টোরেজে সেভ রাখা হলো যাতে থ্যাংক ইউ পেজে ইউআরএল ছাড়াও ডেটা পাওয়া যায়
+        const orderSummaryData = {
           orderId: generatedOrderId,
           name: formData.fullName,
           phone: formData.phoneNumber,
           address: formData.streetAddress,
-          shippingMethod: shippingMethod,
-          shippingCharge: shippingCharge.toString(),
-          total: totalCost.toString(),
-          cart: JSON.stringify(cart),
-        });
+          shippingCost: shippingCharge,
+          cart: cart,
+          total: totalCost,
+        };
+        localStorage.setItem(`order_${generatedOrderId}`, JSON.stringify(orderSummaryData));
 
-        router.push(`/thank-you?${queryParams.toString()}`);
+        if (clearCart) clearCart();
+
+        // প্রোডাকশন লেভেল স্ট্যান্ডার্ড: URL-এ শুধুমাত্র orderId পাঠানো হচ্ছে
+        router.push(`/thank-you?orderId=${generatedOrderId}`);
       } else {
         toast.error(data.message || 'Something went wrong!');
         setIsLoading(false);
@@ -172,7 +174,6 @@ const CheckoutForm = () => {
                       </button>
                     </div>
 
-                    {/* প্রোডাক্টের নাম, কালার, সাইজ এবং কাস্টমাইজেশন ডিটেইলস */}
                     <div className="flex flex-col min-w-0">
                       <span className="text-sm font-medium text-gray-800">
                         {item.title} {!isBuyNow && `(x${itemQty})`}

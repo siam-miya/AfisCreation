@@ -29,7 +29,7 @@ const AdminDashboardPage = () => {
         </div>
         <div className="flex gap-3">
           <Link
-            href="/secret-admin-portal-afia/dashboard/producut/create"
+            href="/secret-admin-portal-afia/dashboard/products/create"
             className="flex items-center gap-2 bg-primary hover:bg-secondary text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm"
           >
             <FiPlus size={18} /> Add New Product

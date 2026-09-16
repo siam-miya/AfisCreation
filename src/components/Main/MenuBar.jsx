@@ -19,6 +19,7 @@ import { Spinner } from '@heroui/react';
 import { AiOutlineHome, AiOutlineAppstore, AiOutlineUser, AiOutlineInfoCircle } from "react-icons/ai"
 import { FaShoppingBag } from "react-icons/fa";
 import { TbTruckDelivery } from 'react-icons/tb';
+import API from '../../utils/api'; 
 
 const MenuBar = () => {
     const pathname = usePathname();
@@ -68,11 +69,10 @@ const MenuBar = () => {
 
         const fetchCategories = async () => {
             try {
-                // `/main-categories` এর বদলে `/all` কল করতে হবে যেন সাব-ক্যাটাগরি সহ ডেটা আসে
-                const res = await fetch('http://localhost:5000/api/v1/categories/all');
-                const data = await res.json();
-                if (data.success) {
-                    setCategories(data.data);
+                // হার্ডকোডেড ফেচ এর বদলে API (axios) ব্যবহার করা হলো
+                const res = await API.get('/categories/all');
+                if (res.data && res.data.success) {
+                    setCategories(res.data.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
